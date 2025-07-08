@@ -1,0 +1,2612 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Minecraft Server</title>
+    <!-- Google Fonts: Inter for modern typography -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        /* Modern & Animated Theme Variables */
+        :root {
+            --box-color: #0d0d0d; /* Even darker black for content boxes */
+            --glow-color: transparent; /* Default glow is transparent unless enabled */
+            --glow-speed: 3s; /* Speed of the glow animation */
+            --glow-brightness: 0.6; /* Intensity of the glow */
+            --bg-theme: linear-gradient(-45deg, #0a0a0a, #111111, #1a1a1a, #0d0d0d); /* Darker black gradient background */
+            --accent-green: #00ffcc; /* Bright cyan-green for primary accents */
+            --accent-blue: #42a5f5; /* Bright blue for secondary accents */
+            --accent-dark-blue: #1976d2; /* Deeper blue for tertiary/forms */
+            --accent-red: #ef5350; /* Red for alerts/offline status */
+            --text-light: #e0e0e0; /* Light text color */
+            --text-dark: #333; /* Dark text for light elements */
+            --border-color: #222; /* Border color for elements (darker) */
+            --hover-bg: #1a1a1a; /* Background on hover (darker) */
+            --button-primary: #00e676; /* Primary button color (green) */
+            --button-secondary: #2196f3; /* Secondary button color (blue) */
+            --button-dark-blue: #1976d2; /* Darker blue for certain buttons */
+            --button-red: #d32f2f; /* Red button color */
+            --sidebar-bg: #0a0a0a; /* Sidebar background (darker) */
+        }
+
+        /* Keyframe Animations */
+        @keyframes glowBox {
+            0% {
+                box-shadow: 0 0 calc(8px * var(--glow-brightness)) var(--glow-color),
+                            0 0 calc(16px * var(--glow-brightness)) var(--glow-color);
+            }
+            100% {
+                box-shadow: 0 0 calc(15px * var(--glow-brightness)) var(--glow-color),
+                            0 0 calc(30px * var(--glow-brightness)) var(--glow-color);
+            }
+        }
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* NEW Loading Animation: Pulsating Dots */
+        @keyframes pulsatingDot {
+            0%, 100% { transform: scale(0.8); opacity: 0.7; }
+            50% { transform: scale(1.2); opacity: 1; }
+        }
+        .loading-spinner {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .loading-spinner div {
+            width: 15px;
+            height: 15px;
+            background-color: var(--accent-green);
+            border-radius: 50%;
+            animation: pulsatingDot 1.5s infinite ease-in-out;
+        }
+        .loading-spinner div:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+        .loading-spinner div:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+        /* --- Base Body and HTML Styles --- */
+        body {
+            margin: 0;
+            font-family: 'Inter', sans-serif; /* Using Inter font */
+            background: var(--bg-theme);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite; /* Slower, smoother background animation */
+            color: var(--text-light);
+            min-height: 100vh; /* Ensure body takes full viewport height */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            overflow-x: hidden; /* Prevent horizontal scroll from animations */
+            transition: background-color 0.3s ease; /* Smooth theme transitions */
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        /* Global button styling */
+        button {
+            background-color: var(--button-primary);
+            color: var(--text-dark);
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: bold;
+            transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            text-decoration: none; /* For button acting as a link */
+        }
+
+        button:hover {
+            background-color: #00c853; /* Darker green on hover */
+            transform: translateY(-2px);
+            box-shadow: 0 6px 10px rgba(0,0,0,0.3);
+        }
+
+        button:disabled {
+            background-color: #555;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        /* Input field styling */
+        input[type="text"],
+        input[type="password"],
+        input[type="email"],
+        textarea,
+        select { /* Added select for contact form */
+            width: calc(100% - 24px); /* Account for padding */
+            padding: 12px;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            background-color: #2a2a2a;
+            color: var(--text-light);
+            font-size: 1em;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        input[type="text"]:focus,
+        input[type="password"]:focus,
+        input[type="email"]:focus,
+        textarea:focus,
+        select:focus { /* Added select for contact form */
+            border-color: var(--accent-green);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(0, 255, 204, 0.3);
+        }
+
+        a {
+            color: var(--accent-blue);
+            text-decoration: none;
+            transition: color 0.3s ease, text-decoration 0.3s ease;
+        }
+        a:hover {
+            color: #66bb6a;
+            text-decoration: underline;
+        }
+
+
+        /* --- Message Box Overlay (for custom alerts) --- */
+        #message-box-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 10001;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+        #message-box-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        .message-box {
+            background: var(--box-color);
+            border: 2px solid var(--accent-green);
+            border-radius: 12px;
+            padding: 30px;
+            max-width: 400px;
+            text-align: center;
+            box-shadow: 0 0 20px rgba(0, 255, 204, 0.5);
+            animation: fadeIn 0.3s ease-out;
+        }
+        .message-box h3 {
+            color: var(--accent-green);
+            margin-top: 0;
+            margin-bottom: 15px;
+            font-size: 1.8em;
+        }
+        .message-box p {
+            color: var(--text-light);
+            font-size: 1.1em;
+            margin-bottom: 0;
+        }
+
+        /* --- Loading Screen (Initial & Post-Auth) --- */
+        #loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #0a0a0a; /* Pure black background for loading */
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 10000;
+            transition: opacity 0.5s ease-out;
+        }
+        #loading-screen.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+        #loading-screen p {
+            color: var(--text-light);
+            font-size: 1.5em;
+            font-weight: 600;
+            animation: fadeIn 1s infinite alternate;
+        }
+
+
+        /* --- Login/Create Account Screen --- */
+        #auth-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--bg-theme);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999; /* Above main content, below loading */
+            padding: 20px;
+        }
+
+        #auth-panel {
+            background: var(--box-color);
+            border-radius: 12px;
+            padding: 40px;
+            box-shadow: 0 0 calc(15px * var(--glow-brightness)) var(--glow-color),
+                        0 0 calc(30px * var(--glow-brightness)) var(--glow-color);
+            animation: glowBox var(--glow-speed) ease-in-out infinite alternate, fadeIn 0.8s ease-out;
+            border: 1px solid var(--border-color);
+            max-width: 450px;
+            width: 100%;
+            text-align: center;
+        }
+
+        #auth-panel h2 {
+            color: var(--accent-green);
+            font-size: 2.5em;
+            margin-bottom: 25px;
+        }
+
+        #auth-form-main {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        /* Style for the agreement checkbox */
+        #auth-form-main .checkbox-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        #auth-form-main .checkbox-container input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            margin: 0;
+            cursor: pointer;
+        }
+        #auth-form-main .checkbox-container label {
+            font-size: 0.95em;
+            color: #ccc;
+        }
+
+
+        #auth-message-main {
+            text-align: center;
+            margin-top: 15px;
+            font-weight: bold;
+        }
+        #auth-message-main.error { color: var(--accent-red); }
+        #auth-message-main.success { color: var(--accent-green); }
+
+
+        /* --- Main Content Layout --- */
+        #main-content-wrapper {
+            display: none; /* Hidden by default until login */
+            width: 100%;
+            max-width: 1400px; /* Wider content area */
+            margin: 0 auto;
+            padding: 20px;
+            transition: transform 0.3s ease;
+            position: relative; /* For sidebar overlay */
+        }
+        #main-content-wrapper.sidebar-open {
+             transform: translateX(250px); /* Move content over when sidebar is open */
+        }
+
+        /* --- Header & Main Nav Buttons Container (Conditional) --- */
+        header {
+            width: 100%;
+            background: var(--box-color);
+            padding: 20px 30px;
+            border-radius: 12px;
+            margin-bottom: 0; /* No margin below header, buttons will follow in new div */
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            animation: fadeIn 0.8s ease-out;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative; /* For menu toggle */
+        }
+
+        header h1 {
+            color: var(--accent-green);
+            font-size: 3em;
+            margin: 0; /* Remove margin below title in header */
+            text-shadow: 0 0 10px rgba(0, 255, 204, 0.4);
+        }
+
+        .navbar-toggle {
+            background: none;
+            border: none;
+            color: var(--text-light);
+            font-size: 1.8em;
+            cursor: pointer;
+            padding: 5px 10px;
+            border-radius: 8px;
+            transition: background 0.3s ease;
+            position: absolute; /* Position relative to header */
+            left: 20px; /* Align to the left */
+            top: 20px;
+        }
+        .navbar-toggle:hover {
+            background: #3a3a3a;
+        }
+        /* Top-right profile area */
+        .header-profile {
+            position: absolute;
+            right: 20px;
+            top: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            user-select: none;
+            z-index: 50; /* Ensure it's above other header elements if needed */
+        }
+        .header-profile .profile-avatar-small {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: #3a3a3a;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.2em;
+            font-weight: bold;
+            color: var(--accent-green);
+            border: 2px solid var(--accent-green);
+            overflow: hidden;
+            transition: transform 0.2s ease;
+        }
+        .header-profile .profile-avatar-small:hover {
+            transform: scale(1.1);
+        }
+        .header-profile .profile-avatar-small img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .header-profile .profile-dropdown {
+            position: absolute;
+            top: 50px; /* Below the avatar */
+            right: 0;
+            background-color: var(--sidebar-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+            display: none;
+            flex-direction: column;
+            padding: 10px 0;
+            min-width: 180px;
+            z-index: 60;
+        }
+        .header-profile .profile-dropdown.active {
+            display: flex;
+        }
+        .header-profile .profile-dropdown a {
+            padding: 10px 15px;
+            color: var(--text-light);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: background-color 0.2s ease;
+        }
+        .header-profile .profile-dropdown a:hover {
+            background-color: #2a2a2a;
+            color: var(--accent-green);
+        }
+
+        /* Homepage Content - Contains the 3 main buttons */
+        #homepage-nav-section {
+            display: flex; /* Always visible after login */
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            max-width: 900px;
+            margin-top: 20px; /* Space from header */
+            padding: 20px; /* Padding for the container of h2 and buttons */
+            background: var(--box-color);
+            border-radius: 12px;
+            box-shadow: 0 0 calc(15px * var(--glow-brightness)) var(--glow-color),
+                        0 0 calc(30px * var(--glow-brightness)) var(--glow-color);
+            border: 1px solid var(--border-color);
+            animation: fadeIn 0.8s ease-out;
+            gap: 20px; /* Space between h2 and buttons */
+        }
+
+
+        #main-nav-buttons {
+            display: flex;
+            flex-wrap: wrap; /* Allow wrapping */
+            justify-content: center;
+            gap: 10px; /* Smaller spacing between buttons */
+            width: 100%; /* Take full width of container */
+        }
+
+        #main-nav-buttons button {
+            /* Exact sizing to match Players sub-nav buttons */
+            padding: 10px 18px;
+            font-size: 0.95em;
+            min-width: 150px;
+            max-width: 200px;
+            height: auto; /* Let content determine height */
+            flex-grow: 1; /* Allow buttons to grow */
+            flex-basis: 180px; /* Roughly 3 per row on larger screens */
+            display: flex;
+            flex-direction: column; /* Stack icon/emoji and text */
+            align-items: center;
+            justify-content: center;
+            gap: 5px; /* Space between icon/emoji and text */
+            background-color: #333; /* Default dark grey */
+            color: var(--text-light);
+            box-shadow: 0 3px 8px rgba(0,0,0,0.3);
+            transition: all 0.3s ease;
+            font-weight: 600;
+        }
+        #main-nav-buttons button i {
+            font-size: 1.8em; /* Icon size */
+            line-height: 1; /* Remove extra space above/below icon */
+        }
+        #main-nav-buttons button span.emoji { /* Added span.emoji for specific emoji styling */
+            font-size: 1.8em; /* Emoji size */
+            line-height: 1; /* Remove extra space above/below emoji */
+        }
+        #main-nav-buttons button span.button-text {
+            font-size: 0.8em; /* Smaller text below icon/emoji */
+            font-weight: 600;
+            color: #eee;
+        }
+
+        #main-nav-buttons button:hover {
+            background-color: var(--accent-green); /* Change color to accent-green on hover */
+            color: var(--text-dark); /* Dark text for light background */
+            transform: translateY(-2px) scale(1.01);
+            box-shadow: 0 5px 10px rgba(0,0,0,0.4);
+        }
+
+
+        /* --- Sidebar --- */
+        #sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 250px;
+            height: 100%;
+            background-color: var(--sidebar-bg);
+            box-shadow: 5px 0 15px rgba(0,0,0,0.5);
+            transform: translateX(-100%); /* Start off-screen */
+            transition: transform 0.3s ease-in-out;
+            z-index: 1000;
+            padding-top: 20px;
+            border-right: 1px solid #333;
+        }
+
+        #sidebar.open {
+            transform: translateX(0); /* Slide in */
+        }
+
+        #sidebar .close-btn {
+            background: none;
+            border: none;
+            color: var(--text-light);
+            font-size: 1.8em;
+            cursor: pointer;
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            padding: 5px 10px;
+            border-radius: 8px;
+            transition: background 0.3s ease;
+        }
+        #sidebar .close-btn:hover {
+            background: #3a3a3a;
+        }
+
+        #sidebar nav ul {
+            list-style: none;
+            padding: 0;
+            margin-top: 60px; /* Space for close button */
+        }
+
+        #sidebar nav li {
+            margin-bottom: 5px;
+        }
+
+        #sidebar nav a {
+            display: block;
+            padding: 12px 20px;
+            color: var(--text-light);
+            text-decoration: none;
+            font-size: 1.1em;
+            transition: background-color 0.3s ease, color 0.3s ease;
+            border-radius: 5px;
+            margin: 0 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        #sidebar nav a:hover {
+            background-color: #2a2a2a;
+            color: var(--accent-green);
+        }
+        #sidebar nav a.active {
+            background-color: var(--accent-green);
+            color: var(--text-dark);
+            font-weight: bold;
+        }
+
+
+        /* Account Section in Sidebar */
+        #account-settings-content {
+            background: var(--box-color);
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 0 calc(15px * var(--glow-brightness)) var(--glow-color),
+                        0 0 calc(30px * var(--glow-brightness)) var(--glow-color);
+            animation: glowBox var(--glow-speed) ease-in-out infinite alternate, fadeIn 0.8s ease-out;
+            border: 1px solid var(--border-color);
+        }
+        #account-settings-content h2 {
+            color: var(--accent-green);
+            font-size: 2.2em;
+            margin-bottom: 25px;
+            text-align: center;
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 15px;
+        }
+
+
+        .profile-container {
+            display: flex;
+            flex-direction: row; /* Default row for larger screens */
+            justify-content: space-between; /* Space between profile and form */
+            align-items: flex-start; /* Align items to the top */
+            gap: 30px; /* Space between profile info and form */
+            max-width: 800px; /* Constrain width of profile section */
+            margin: 20px auto; /* Center it */
+            background-color: #2a2a2a;
+            padding: 25px;
+            border-radius: 10px;
+            border: 1px solid #444;
+        }
+
+        .profile-info-display {
+            display: flex;
+            flex-direction: column;
+            align-items: center; /* Center profile info horizontally */
+            flex-grow: 1; /* Allow to grow */
+            max-width: 250px; /* Max width for the info display */
+            padding-right: 20px; /* Space from form */
+            border-right: 1px solid #444; /* Separator */
+        }
+        @media (max-width: 768px) {
+            .profile-container {
+                flex-direction: column; /* Stack on smaller screens */
+                align-items: center;
+            }
+            .profile-info-display {
+                border-right: none;
+                border-bottom: 1px solid #444; /* Separator for stacked layout */
+                padding-right: 0;
+                padding-bottom: 20px;
+                margin-bottom: 20px;
+                max-width: 100%;
+            }
+        }
+
+
+        .profile-avatar {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background-color: #3a3a3a;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 3em;
+            font-weight: bold;
+            color: var(--accent-green);
+            margin-bottom: 15px;
+            border: 3px solid var(--accent-green);
+            overflow: hidden; /* For image */
+            position: relative;
+            cursor: pointer; /* Indicate clickable */
+            box-shadow: 0 0 10px rgba(0, 255, 204, 0.4);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .profile-avatar:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 15px rgba(0, 255, 204, 0.6);
+        }
+
+        .profile-avatar input[type="file"] {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            cursor: pointer;
+            z-index: 10;
+        }
+        .profile-info-text {
+            font-size: 0.9em;
+            color: #ccc;
+            text-align: center;
+            word-break: break-all;
+            margin-bottom: 10px;
+            width: 100%; /* Ensure text wraps within display area */
+        }
+        .profile-info-text strong {
+            color: var(--text-light);
+            display: block; /* Make strong tags block to stack info */
+            font-size: 1.1em;
+            margin-bottom: 5px;
+        }
+        .profile-info-text span {
+            display: block; /* Ensure value is on new line */
+            margin-bottom: 8px;
+            font-size: 1.05em;
+            color: var(--accent-blue);
+        }
+
+        #profile-form {
+            flex-grow: 2; /* Form takes more space */
+            max-width: 450px; /* Max width for the form itself */
+            width: 100%; /* Occupy available width within flex item */
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        #profile-form label {
+            color: #ccc;
+            font-size: 0.95em;
+            margin-bottom: -10px; /* Pull label closer to input */
+        }
+        #profile-form input {
+            width: calc(100% - 24px);
+        }
+
+        /* Change Password Section */
+        #change-password-content {
+            max-width: 500px;
+            margin: 20px auto;
+            background-color: #2a2a2a;
+            padding: 25px;
+            border-radius: 10px;
+            border: 1px solid #444;
+        }
+        #change-password-content form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        #change-password-content label {
+            color: #ccc;
+            font-size: 0.95em;
+            margin-bottom: -10px;
+        }
+        #change-password-content input[type="password"] {
+            width: calc(100% - 24px);
+        }
+
+
+        /* --- Main Content Sections --- */
+        .main-content-area {
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 30px; /* Spacing between main sections */
+        }
+
+        /* Container for dynamic content below the main buttons */
+        #dynamic-content-area {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 30px; /* Space between the content sections */
+        }
+
+        .content-section {
+            display: none; /* Hidden by default, shown by JS */
+            padding: 30px;
+            border-radius: 12px;
+            background: var(--box-color);
+            box-shadow: 0 0 calc(15px * var(--glow-brightness)) var(--glow-color),
+                        0 0 calc(30px * var(--glow-brightness)) var(--glow-color);
+            border: 1px solid var(--border-color);
+            animation: fadeIn 0.8s ease-out;
+        }
+        .content-section.active {
+            display: block;
+        }
+
+        section h2 {
+            color: var(--accent-green);
+            font-size: 2.2em;
+            margin-bottom: 25px;
+            text-align: center;
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 15px;
+        }
+
+        /* Server Info & Status */
+        #server-info-content p {
+            font-size: 1.1em;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background-color: #2a2a2a;
+            padding: 10px 15px;
+            border-radius: 8px;
+            border: 1px solid #444;
+        }
+        #server-info-content p strong {
+            color: var(--accent-green);
+        }
+        #server-info-content p span {
+            font-weight: 600;
+        }
+        #server-info-content .status-online { color: #8bc34a; }
+        #server-info-content .status-offline { color: var(--accent-red); }
+        #server-info-content .status-expired { color: #ff8c00; } /* Orange for Expired */
+
+
+        #server-info-content .player-list {
+            list-style: none;
+            padding: 0;
+            margin-top: 20px;
+            background-color: #2a2a2a;
+            border-radius: 8px;
+            border: 1px solid #444;
+            padding: 15px;
+        }
+        #server-info-content .player-list li {
+            padding: 8px 0;
+            border-bottom: 1px dashed #444;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        #server-info-content .player-list li:last-child {
+            border-bottom: none;
+        }
+        #server-info-content .player-list li span {
+            color: #ccc;
+        }
+
+
+        /* Plugins Section */
+        #plugins-content {
+            padding: 30px;
+        }
+
+        #plugin-search {
+            width: calc(100% - 24px); /* Adjust for padding */
+            margin-bottom: 25px;
+            font-size: 1.1em;
+            padding: 10px;
+        }
+
+        #plugin-list {
+            list-style: none;
+            padding: 0;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); /* Responsive grid */
+            gap: 20px;
+        }
+
+        #plugin-list li {
+            background: #2a2a2a; /* Darker background for each plugin card */
+            padding: 20px;
+            border-radius: 10px;
+            transition: background 0.3s ease, transform 0.2s ease;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            border: 1px solid #444;
+            position: relative;
+            overflow: hidden; /* Hide overflow for animations */
+        }
+
+        #plugin-list li.non-working-plugin {
+            border: 2px solid var(--accent-red); /* Red border for non-working plugins */
+            box-shadow: 0 0 10px rgba(239, 83, 80, 0.5); /* Red glow for non-working plugins */
+        }
+
+        #plugin-list li:hover {
+            background: #3a3a3a; /* Even darker on hover */
+            transform: translateY(-5px); /* Lift effect */
+        }
+
+        #plugin-list li h3 {
+            color: var(--accent-green);
+            font-size: 1.5em;
+            margin-bottom: 10px;
+            border-bottom: 1px solid #555;
+            padding-bottom: 8px;
+        }
+        #plugin-list li.non-working-plugin h3 {
+            color: var(--accent-red); /* Red text for non-working plugin title */
+        }
+
+        #plugin-list li p.description {
+            color: #ccc;
+            font-size: 0.95em;
+            margin-bottom: 15px;
+            line-height: 1.5;
+        }
+        #plugin-list li p.problem-message {
+            color: var(--accent-red);
+            font-weight: bold;
+            margin-top: 10px;
+            margin-bottom: 10px;
+        }
+
+
+        #plugin-list li .plugin-links {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: auto; /* Push links to bottom */
+            justify-content: space-between; /* Space out links */
+        }
+
+        .plugin-link-btn {
+            background-color: #555;
+            color: white;
+            padding: 8px 15px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-size: 0.9em;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .plugin-link-btn:hover {
+            background-color: #777;
+            transform: translateY(-2px);
+        }
+
+        .plugin-video {
+            width: 100%;
+            aspect-ratio: 16 / 9; /* Standard video aspect ratio */
+            border-radius: 8px;
+            overflow: hidden;
+            margin-top: 15px;
+            border: 2px solid var(--accent-green); /* Green border for videos */
+            box-shadow: 0 0 10px rgba(0, 255, 204, 0.4);
+        }
+
+        .plugin-video iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+        .plugin-video.placeholder {
+            background-color: #3a3a3a;
+            color: #ccc;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-style: italic;
+            font-size: 0.9em;
+        }
+
+
+        /* How to Play & Start Server Section (now also "Guides") */
+        #how-to-play-content ol {
+            list-style: none; /* Remove default numbering */
+            padding-left: 0;
+            counter-reset: li-counter; /* Initialize counter */
+        }
+
+        #how-to-play-content li {
+            margin-bottom: 15px;
+            font-size: 1.1em;
+            position: relative;
+            padding-left: 35px; /* Space for custom number */
+            color: #ccc;
+        }
+
+        #how-to-play-content li::before {
+            counter-increment: li-counter; /* Increment counter */
+            content: counter(li-counter) ".";
+            color: var(--accent-green);
+            font-weight: bold;
+            font-size: 1.2em;
+            position: absolute;
+            left: 0;
+            top: 0;
+            background: #2a2a2a;
+            width: 25px;
+            height: 25px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            border: 1px solid var(--accent-green);
+        }
+        #how-to-play-content a {
+            color: var(--accent-blue);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+        a:hover {
+            text-decoration: underline;
+            color: #66bb6a;
+        }
+
+        /* Forms Section */
+        #forms-content div {
+            margin-top: 20px;
+        }
+        #forms-content a {
+            font-size: 1.2em;
+            background-color: var(--accent-dark-blue); /* Forms button color */
+            color: white;
+            padding: 12px 25px;
+            border-radius: 8px;
+            text-decoration: none;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            display: inline-flex; /* Allow padding and margin */
+            align-items: center;
+            gap: 8px;
+        }
+        #forms-content a:hover {
+            background-color: #1565c0; /* Darker shade of dark blue */
+            transform: translateY(-2px);
+        }
+
+        /* Players Section */
+        #players-content .player-sub-nav {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 30px;
+            border-bottom: 1px solid #444;
+            padding-bottom: 15px;
+        }
+        #players-content .player-sub-nav button {
+            background-color: #333;
+            color: var(--text-light);
+            padding: 10px 18px;
+            border-radius: 6px;
+            font-size: 0.95em;
+            transition: background-color 0.3s ease, color 0.3s ease;
+            flex-grow: 1; /* Allow buttons to grow slightly */
+            max-width: 200px; /* Max width for individual buttons */
+        }
+        #players-content .player-sub-nav button.active,
+        #players-content .player-sub-nav button:hover {
+            background-color: var(--accent-green);
+            color: var(--text-dark);
+            box-shadow: 0 0 8px rgba(0,255,204,0.5);
+        }
+        #players-content .player-sub-content {
+            display: none; /* Hidden by default */
+            animation: fadeIn 0.5s ease-out;
+        }
+        #players-content .player-sub-content.active {
+            display: block;
+        }
+
+        #players-content ul {
+            list-style: none;
+            padding: 0;
+        }
+        #players-content li {
+            background-color: #2a2a2a;
+            margin-bottom: 10px;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #444;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap; /* Allow wrapping for long content */
+            gap: 10px; /* Space between items */
+        }
+        #players-content li strong {
+            color: var(--accent-green);
+            font-size: 1.1em;
+        }
+        #players-content li span {
+            color: #ccc;
+            font-size: 1em;
+        }
+        #players-content .player-post-area {
+            background-color: #2a2a2a;
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid #444;
+            text-align: center;
+        }
+
+
+        /* Contact Us section (repurposed from Issue Report) */
+        #contact-us-content {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        #contact-us-content form button {
+            width: 100%;
+            background-color: var(--accent-dark-blue); /* Contact button color */
+        }
+        #contact-us-content form button:hover {
+            background-color: #1565c0; /* Darker shade of dark blue */
+        }
+        #contact-us-status {
+            text-align: center;
+            margin-top: 20px;
+            font-weight: bold;
+            color: var(--accent-green);
+        }
+        #contact-us-status.error {
+            color: var(--accent-red);
+        }
+
+        /* Rules Section */
+        #rules-content ul {
+            list-style: none;
+            padding-left: 0;
+        }
+        #rules-content li {
+            background-color: #2a2a2a;
+            margin-bottom: 10px;
+            padding: 15px;
+            border-left: 5px solid var(--accent-green);
+            border-radius: 8px;
+        }
+        #rules-content li strong {
+            color: var(--accent-green);
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        /* Theme Settings Section */
+        #theme-settings-content #themePanel {
+            position: static; /* No longer fixed */
+            display: block; /* Always visible within its section */
+            opacity: 1;
+            transform: none;
+            margin: 0 auto; /* Center within its section */
+            background: #1a1a1a;
+            border: 2px solid var(--accent-green);
+            border-radius: 10px;
+            padding: 20px;
+            max-width: 500px; /* Constrain width */
+            box-shadow: none; /* Already handled by content-section */
+        }
+        #theme-settings-content h2 {
+            margin-bottom: 20px;
+        }
+
+        #theme-settings-content label { /* Styling for theme labels */
+            display: block;
+            margin-top: 10px;
+            margin-bottom: 5px;
+            color: #ccc;
+            font-size: 0.95em;
+        }
+        #theme-settings-content input[type="color"] {
+            width: calc(100% - 24px); /* Match other inputs */
+            padding: 5px; /* Smaller padding for color input */
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            background-color: #2a2a2a;
+            height: 40px; /* Make color picker larger */
+            cursor: pointer;
+        }
+        #theme-settings-content input[type="range"] {
+            width: calc(100% - 24px); /* Match other inputs */
+            margin-top: 5px;
+        }
+        #theme-settings-content input[type="checkbox"] {
+            margin-right: 8px;
+        }
+
+
+        /* --- Footer --- */
+        footer {
+            width: 100%;
+            max-width: 1400px; /* Match main content width */
+            text-align: center;
+            margin-top: 50px;
+            padding: 20px;
+            background: var(--box-color);
+            border-radius: 12px;
+            color: #aaa;
+            font-size: 0.9em;
+            box-shadow: 0 -4px 15px rgba(0,0,0,0.3);
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        footer a {
+            color: var(--accent-green);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+            color: #00ddbb;
+        }
+
+        /* Custom message for inline forms */
+        .custom-message {
+            margin-top: 10px;
+            font-size: 0.9em;
+            font-weight: bold;
+        }
+        .custom-message.error {
+            color: var(--accent-red);
+        }
+        .custom-message.success {
+            color: var(--accent-green);
+        }
+    </style>
+</head>
+<body>
+    <!-- Message Box Overlay (for custom alerts) -->
+    <div id="message-box-overlay" class="message-box-overlay">
+        <div class="message-box">
+            <h3 id="message-box-title"></h3>
+            <p id="message-box-content"></p>
+        </div>
+    </div>
+
+    <!-- Loading Screen -->
+    <div id="loading-screen">
+        <div class="loading-spinner">
+            <div></div>
+            <div></div>
+            <div></div>
+        </div>
+        <p>Loading Minecraft Experience...</p>
+    </div>
+
+    <!-- Authentication Screen (Initially visible, hides after login/create) -->
+    <div id="auth-screen">
+        <div id="auth-panel">
+            <h2 id="auth-welcome-message">Welcome Back!</h2>
+            <form id="auth-form-main">
+                <input type="text" id="auth-email-input" placeholder="Enter Username or Email" required>
+                <input type="password" id="auth-password-input" placeholder="Password" required>
+
+                <!-- New: Platform Select (moved above username) -->
+                <label for="auth-platform-select" style="display: none; text-align: left; margin-top: 5px;">Minecraft Edition:</label>
+                <select id="auth-platform-select" style="display: none;" required>
+                    <option value="">-- Select Edition --</option>
+                    <option value="java">Java Edition</option>
+                    <option value="bedrock">Bedrock Edition</option>
+                </select>
+
+                <!-- Minecraft Username input - will have dot for Bedrock -->
+                <input type="text" id="auth-minecraft-username-input" placeholder="Minecraft Username" style="display: none;">
+                <input type="text" id="auth-account-name-input" placeholder="Account Name (e.g. Guild Name)" style="display: none;">
+                
+                <div class="checkbox-container" id="rules-checkbox-container" style="display: none;">
+                    <input type="checkbox" id="agree-rules-checkbox">
+                    <label for="agree-rules-checkbox">I agree to the <a href="https://minecraft2613.github.io/Minecarft-2613-Rules/" target="_blank">Minecraft Server Rules</a></label>
+                </div>
+
+                <button type="submit" id="main-auth-submit-btn" style="background-color: var(--accent-blue);">Login</button>
+                <p id="auth-message-main"></p>
+
+                <div style="margin-top: 15px; border-top: 1px dashed #333; padding-top: 15px;">
+                    <button type="button" id="toggle-auth-mode-btn" style="background-color: var(--accent-dark-blue);">Don't have an account? Create one</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Main Content Wrapper (Hidden until authenticated) -->
+    <div id="main-content-wrapper">
+        <header>
+            <button class="navbar-toggle" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
+            <h1>?? Minecraft Server</h1>
+            <!-- Top-right profile display -->
+            <div class="header-profile" id="header-profile-display">
+                <div class="profile-avatar-small" id="header-profile-avatar">
+                    <span id="header-profile-initial"></span>
+                    <img id="header-profile-image" src="" alt="Profile Pic" style="display: none;">
+                </div>
+                <div class="profile-dropdown" id="profile-dropdown-menu">
+                    <a href="#" onclick="showSection('account-settings-content'); toggleProfileDropdown(); return false;"><i class="fas fa-user-cog"></i> View Profile</a>
+                    <a href="#" onclick="showSection('change-password-content'); toggleProfileDropdown(); return false;"><i class="fas fa-key"></i> Change Password</a>
+                </div>
+            </div>
+        </header>
+
+        <main class="main-content-area">
+            <!-- Sidebar -->
+            <aside id="sidebar">
+                <button class="close-btn" onclick="toggleSidebar()"><i class="fas fa-times"></i></button>
+                <nav>
+                    <ul>
+                        <li><a href="#" data-section="server-info-content" class="active"><i class="fas fa-home"></i> Home</a></li>
+                        <li><a href="#" data-section="account-settings-content"><i class="fas fa-user-cog"></i> Account Settings</a></li>
+                        <li><a href="https://minecraft2613.github.io/taxess/" target="_blank"><i class="fas fa-money-check-alt"></i> View Your Tax</a></li>
+                        <li><a href="#" data-section="players-content"><i class="fas fa-users"></i> Players</a></li>
+                        <li><a href="#" data-section="forms-content"><i class="fas fa-file-alt"></i> Forms</a></li>
+                        <li><a href="#" data-section="contact-us-content"><i class="fas fa-envelope"></i> Contact Us</a></li>
+                        <li><a href="https://minecraft2613.github.io/Minecarft-2613-Rules/" target="_blank"><i class="fas fa-scroll"></i> Rules</a></li> <!-- External Rules Link -->
+                        <li><a href="#" data-section="theme-settings-content"><i class="fas fa-palette"></i> Theme Settings</a></li>
+                        <li><button id="sidebar-logout-btn" style="background-color: var(--button-red); margin: 20px auto; width: calc(100% - 20px);" onclick="logoutUser()"><i class="fas fa-sign-out-alt"></i> Logout</button></li>
+                    </ul>
+                </nav>
+            </aside>
+            <div class="overlay" onclick="toggleSidebar()"></div>
+
+            <!-- This div contains the always-visible navigation buttons -->
+            <div id="homepage-nav-section">
+                <h2 style="text-align: center; color: var(--accent-green);">Choose Your Path</h2>
+                <div id="main-nav-buttons">
+                    <button onclick="showSection('server-info-content')">
+                        <i class="fas fa-info-circle"></i> <!-- Old icon for Server Details -->
+                        <span class="button-text">Server Details</span>
+                    </button>
+                    <button onclick="showSection('plugins-content')">
+                        <i class="fas fa-puzzle-piece"></i>
+                        <span class="button-text">Plugins</span>
+                    </button>
+                    <button onclick="showSection('how-to-play-content')">
+                        <i class="fas fa-question-circle"></i>
+                        <span class="button-text">How to Play & Start</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- This container holds all the dynamic content sections below the main nav buttons -->
+            <div id="dynamic-content-area">
+                <!-- Server Info Content (Default active after login) -->
+                <div id="server-info-content" class="content-section active">
+                    <h2>??? Server Info & Status</h2>
+                    <p><strong><i class="fas fa-link"></i> Server IP:</strong> <span id="server-ip">mc1524209.fmcs.cloud</span> <button onclick="copyToClipboard('server-ip')">?? Copy</button></p>
+                    <p><strong><i class="fas fa-ethernet"></i> Port:</strong> <span id="server-port">38762</span> <button onclick="copyToClipboard('server-port')">?? Copy</button></p>
+                    <p>
+                        <strong><i class="fas fa-mobile-alt"></i> Quick Join (Bedrock):</strong>
+                        <a href="minecraft://?addExternalServer=MyServer|mc1524209.fmcs.cloud:47112">
+                            <button><i class="fas fa-gamepad"></i> Connect with Bedrock</button>
+                        </a>
+                    </p>
+                    <p><strong><i class="fab fa-java"></i> Java Version:</strong> <span>1.21.4-1.7(via backward & and via version)</span></p>
+                    <p><strong><i class="fas fa-cube"></i> Bedrock Version:</strong> <span>1.21.70-1.211.81(via Geyser)</span></p>
+                    <p><strong><i class="fas fa-globe"></i> Public Page:</strong> <a href="https://freemcserver.net/server/1524209" target="_blank" class="plugin-link-btn" style="background-color: var(--button-red);"><i class="fas fa-external-link-alt"></i> View Server</a></p>
+
+                    <h3 style="color: var(--accent-green); font-size: 1.8em; margin-top: 30px; text-align: center;">?? Live Server Status</h3>
+                    <p><strong>Status:</strong> <span id="server-status">Checking status...</span></p>
+                    <p><strong>Players:</strong> <span id="player-count"></span></p>
+
+                    <div id="server-control-options" style="text-align: center; margin-top: 20px;">
+                        <!-- Buttons appear here based on status -->
+                    </div>
+
+                    <h3 style="color: var(--accent-green); font-size: 1.8em; margin-top: 30px; text-align: center;">?? Online Players</h3>
+                    <ul id="online-players-list" class="player-list">
+                        <li>Loading player list...</li>
+                    </ul>
+                </div>
+
+                <!-- Plugins Content (Initially hidden, shown by button click) -->
+                <div id="plugins-content" class="content-section">
+                    <h2>?? Plugins</h2>
+                    <div class="player-sub-nav">
+                        <button data-plugin-sub-section="all-plugins" class="active">?? All Plugins</button>
+                        <button data-plugin-sub-section="non-working-plugins">?? Non-Working Plugins</button>
+                    </div>
+                    <input type="text" id="plugin-search" placeholder="Search plugins..." class="glowTarget">
+                    <ul id="plugin-list">
+                        <!-- Plugins will be dynamically loaded by JavaScript -->
+                    </ul>
+                </div>
+
+                <!-- How to Play & Start Server Content (Initially hidden, shown by button click) -->
+                <div id="how-to-play-content" class="content-section">
+                    <h2>?? How to Join & Start The Server</h2>
+                    <h3 style="color: var(--accent-green); font-size: 1.5em; margin-bottom: 20px;">How to Join</h3>
+                    <ol>
+                        <li>Open Minecraft (Bedrock users click on the <strong style="color:var(--accent-green);">Connect with Bedrock</strong> button above).</li>
+                        <li>Click on <strong>Multiplayer</strong> ? <strong>Add Server</strong>.</li>
+                        <li>Enter the Server IP: <strong style="color:var(--accent-green);">mc1524209.fmcs.cloud</strong></li>
+                        <li>Use Port: <strong style="color:var(--accent-green);">38762</strong></li>
+                        <li>Click <strong>Join Server</strong> and enjoy!</li>
+                    </ol>
+
+                    <h3 style="color: var(--accent-green); font-size: 1.5em; margin-top: 30px; margin-bottom: 20px;">How to Start Server if Offline</h3>
+                    <ol>
+                        <li>Click the relevant button in the <strong>Live Server Status</strong> section above.</li>
+                        <li>It will open FreeMcServer's public page.</li>
+                        <li>Scroll down the page.</li>
+                        <li>If it shows <strong>Stop and Expires in X mins</strong>, the server is already starting or online.</li>
+                        <li>If it shows <strong>Start</strong>, click it.</li>
+                        <li>Wait around 5 minutes.</li>
+                        <li>Then follow the steps in <strong>How to Play</strong>.</li>
+                    </ol>
+                </div>
+
+                <!-- Account Settings Content (Sidebar only access) -->
+                <div id="account-settings-content" class="content-section">
+                    <h2>?? Account Settings</h2>
+                    <div class="profile-container">
+                        <div class="profile-info-display">
+                            <h3 style="color: var(--accent-green); text-align: center; margin-bottom: 20px;">Your Profile</h3>
+                            <div class="profile-avatar">
+                                <span id="profile-initial"></span>
+                                <img id="profile-image" src="" alt="Profile Pic" style="display: none;">
+                                <input type="file" id="avatar-upload" accept="image/*">
+                            </div>
+                            <p style="text-align: center; color: #aaa; font-size: 0.9em; margin-top: 5px; margin-bottom: 20px;">Click avatar to change</p>
+
+                            <div class="profile-info-text">
+                                <strong>Email:</strong> <span id="display-email"></span>
+                                <strong>Minecraft Username:</strong> <span id="display-minecraft-username"></span>
+                                <strong>Minecraft Edition:</strong> <span id="display-minecraft-edition"></span> <!-- New display for edition -->
+                                <strong>Account ID:</strong> <span id="display-account-id"></span>
+                                <strong>Account Name:</strong> <span id="display-account-name"></span>
+                            </div>
+                            <button onclick="showSection('change-password-content')" style="background-color: var(--accent-blue); margin-top: 15px;">
+                                <i class="fas fa-key"></i> Change Password
+                            </button>
+                        </div>
+
+                        <form id="profile-form">
+                            <h3 style="color: var(--accent-green); text-align: center; margin-bottom: 20px;">Update Info</h3>
+                            <label for="minecraft-username">Minecraft Username:</label>
+                            <input type="text" id="minecraft-username" placeholder="Your Minecraft Username">
+
+                            <label for="account-name">Account Name:</label>
+                            <input type="text" id="account-name" placeholder="e.g. Your Guild Name">
+
+                            <button type="submit" style="background-color: var(--accent-blue);">Save Profile</button>
+                            <p id="profile-message" style="text-align: center; margin-top: 15px; color: var(--accent-green);"></p>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- New: Change Password Section (Accessed from top-right dropdown) -->
+                <div id="change-password-content" class="content-section">
+                    <h2>?? Change Password</h2>
+                    <form id="change-password-form">
+                        <label for="current-password">Current Password:</label>
+                        <input type="password" id="current-password" required>
+
+                        <label for="new-password">New Password:</label>
+                        <input type="password" id="new-password" required>
+
+                        <label for="confirm-new-password">Confirm New Password:</label>
+                        <input type="password" id="confirm-new-password" required>
+
+                        <button type="submit" style="background-color: var(--accent-blue);">Update Password</button>
+                        <p id="change-password-message" style="text-align: center; margin-top: 15px;"></p>
+                    </form>
+                </div>
+
+
+                <!-- NEW: Players Content (Sidebar only access) -->
+                <div id="players-content" class="content-section">
+                    <h2>?? Players Leaderboard</h2>
+                    <div class="player-sub-nav">
+                        <button data-player-sub-section="top-richest" class="active">?? Top 3 Richest</button>
+                        <button data-player-sub-section="all-players">?? All Players</button>
+                        <button data-player-sub-section="top-taxed">?? Top 3 Most Taxed</button>
+                        <button data-player-sub-section="player-post">?? Player Post</button>
+                    </div>
+
+                    <div id="top-richest-content" class="player-sub-content active">
+                        <h3 style="color: var(--accent-green); text-align: center; margin-bottom: 20px;">?? Top 3 Richest Players</h3>
+                        <ul id="richest-players-list">
+                            <!-- Data populated by JS -->
+                        </ul>
+                    </div>
+
+                    <div id="all-players-content" class="player-sub-content">
+                        <h3 style="color: var(--accent-green); text-align: center; margin-bottom: 20px;">All Active Players</h3>
+                        <input type="text" id="all-players-search" placeholder="Search players...">
+                        <ul id="all-players-list">
+                            <!-- Players will be rendered here with Java/Bedrock indication -->
+                        </ul>
+                    </div>
+
+                    <div id="top-taxed-content" class="player-sub-content">
+                        <h3 style="color: var(--accent-green); text-align: center; margin-bottom: 20px;">?? Top 3 Most Taxed Players</h3>
+                        <ul id="taxed-players-list">
+                            <!-- Data populated by JS -->
+                        </ul>
+                    </div>
+
+                    <div id="player-post-content" class="player-sub-content">
+                        <h3 style="color: var(--accent-green); text-align: center; margin-bottom: 20px;">?? Player Announcements / Posts</h3>
+                        <div class="player-post-area">
+                            <p style="color: #ccc;">No new player posts yet. Check back later!</p>
+                            <p style="font-size: 0.9em; margin-top: 15px; color: #999;">(Feature for players to submit announcements coming soon!)</p>
+                        </div>
+                    </div>
+                </div>
+
+
+                <!-- Forms Content (Sidebar only access) -->
+                <div id="forms-content" class="content-section">
+                    <h2>?? Forms</h2>
+                    <div style="text-align: center;">
+                        <a href="https://minecraft2613.github.io/joining-form/" style="background-color: var(--accent-dark-blue);"><i class="fas fa-hand-holding-usd"></i> Fill Joining Bonus Form</a>
+                        <p style="margin-top: 20px; color: #ccc;">More forms coming soon!</p>
+                    </div>
+                </div>
+
+                <!-- Contact Us section (formerly Issue Report) -->
+                <div id="contact-us-content" class="content-section">
+                    <h2>?? Contact Us</h2>
+                    <p style="text-align: center; color: #ccc; margin-bottom: 20px;">Have questions, feedback, or an issue? Let us know below. We'll get back to you via Discord!</p>
+                    <form id="contact-us-form">
+                        <label for="contact-minecraft-username">Your Minecraft Username:</label>
+                        <input type="text" id="contact-minecraft-username" placeholder="Your Minecraft Username" required><br>
+
+                        <label for="contact-discord-id">Your Discord ID (e.g., user#1234):</label>
+                        <input type="text" id="contact-discord-id" placeholder="Your Discord#ID" required><br>
+
+                        <label for="contact-message">Your message:</label>
+                        <textarea id="contact-message" placeholder="Please describe your message or issue..." rows="5" required></textarea><br>
+                        <button type="submit" style="background-color: var(--accent-dark-blue);"><i class="fas fa-paper-plane"></i> Send Message</button>
+                    </form>
+                    <p id="contact-us-status" class="custom-message"></p>
+                </div>
+
+                <!-- Rules Section -->
+                <div id="rules-content" class="content-section">
+                    <h2>?? Server Rules</h2>
+                    <ul>
+                        <li><strong>Rule 1: Be Respectful.</strong> Treat all players with kindness and respect. Harassment, hate speech, and discrimination will not be tolerated.</li>
+                        <li><strong>Rule 2: No Griefing or Stealing.</strong> Do not destroy or modify other players' builds or steal their items.</li>
+                        <li><strong>Rule 3: No Cheating or Exploiting.</strong> Do not use any hacks, clients, or exploits that give you an unfair advantage.</li>
+                        <li><strong>Rule 4: Keep Chat Appropriate.</strong> Avoid excessive profanity, spamming, and inappropriate content in chat.</li>
+                        <li><strong>Rule 5: Land Claim.</strong> Protect your builds by claiming land. Unclaimed builds are subject to removal.</li>
+                        <li><strong>Rule 6: PvP Consent.</strong> PvP is only allowed with mutual consent from all parties involved.</li>
+                        <li><strong>Rule 7: Report Issues.</strong> If you encounter a bug, a rule-breaker, or need help, report it to staff.</li>
+                        <li><strong>Rule 8: Follow Staff Instructions.</strong> Respect decisions made by server staff.</li>
+                    </ul>
+                    <p style="text-align: center; margin-top: 20px; color: #999;">For a detailed list of rules, please visit our <a href="https://minecraft2613.github.io/Minecarft-2613-Rules/" target="_blank">full rules page</a>.</p>
+                </div>
+
+                <!-- Theme Settings Content (Sidebar only access) -->
+                <div id="theme-settings-content" class="content-section">
+                    <h2>?? Theme Settings</h2>
+                    <div id="themePanel">
+                        <label for="boxColor">Box Background Color</label>
+                        <input type="color" id="boxColor">
+
+                        <label for="glowColor">Glow Color</label>
+                        <input type="color" id="glowColor">
+
+                        <label><input type="checkbox" id="glowToggle"> Enable Glow</label>
+
+                        <label for="glowSpeed">Glow Speed (seconds)</label>
+                        <input type="range" id="glowSpeed" min="1" max="10" value="3">
+
+                        <label for="glowBrightness">Glow Brightness</label>
+                        <input type="range" id="glowBrightness" min="0" max="1" step="0.1" value="0.6">
+
+                        <label for="bgTheme">Background Theme (CSS gradient or image URL)</label>
+                        <input type="text" id="bgTheme" placeholder="e.g. linear-gradient(...) or url(...)">
+
+                        <label for="textLightColor">Text Light Color</label>
+                        <input type="color" id="textLightColor">
+
+                        <label for="accentGreenColor">Accent Green Color</label>
+                        <input type="color" id="accentGreenColor">
+
+                        <label for="accentBlueColor">Accent Blue Color</label>
+                        <input type="color" id="accentBlueColor">
+
+                        <div style="text-align:center; margin-top: 25px;">
+                            <button onclick="saveTheme()">?? Save</button>
+                            <button onclick="resetTheme()">?? Reset</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <footer>
+            <p>&copy; 2025 Minecraft Server. Hosted via <a href="https://freemcserver.net" target="_blank">FreeMcServer.net</a></p>
+        </footer>
+    </div>
+
+    <script>
+        // --- Custom Message Box (Replaces alert()) ---
+        const messageBoxOverlay = document.getElementById('message-box-overlay');
+        const messageBoxTitle = document.getElementById('message-box-title');
+        const messageBoxContent = document.getElementById('message-box-content');
+
+        // Function to show custom alert that auto-dismisses
+        function showCustomAlert(title, message, duration = 3000) { // Default 3 seconds
+            messageBoxTitle.textContent = title;
+            messageBoxContent.textContent = message;
+            messageBoxOverlay.classList.add('active');
+
+            setTimeout(() => {
+                messageBoxOverlay.classList.remove('active');
+            }, duration);
+        }
+
+        // Intercept standard alert calls to use custom box (for development/testing)
+        const originalAlert = window.alert;
+        window.alert = function(message) {
+            showCustomAlert('Alert', message);
+        };
+
+        // --- Loading Screen Logic ---
+        document.addEventListener('DOMContentLoaded', () => {
+            const loadingScreen = document.getElementById('loading-screen');
+            console.log('DOMContentLoaded: Hiding loading screen after 1.5s.');
+            setTimeout(() => {
+                loadingScreen.classList.add('hidden');
+                loadingScreen.addEventListener('transitionend', () => {
+                    loadingScreen.remove(); // Remove from DOM after animation
+                    console.log('Loading screen removed.');
+                });
+            }, 1500); // Display loading for 1.5 seconds
+        });
+
+        // --- Simulated Cloudflare API Layer for User Data ---
+        // !!! IMPORTANT: THIS IS A SIMULATION FOR LOCAL TESTING !!!
+        // FOR PRODUCTION, YOU WOULD DEPLOY A CLOUDFLARE WORKER AND USE KV NAMESPACES.
+
+        const CLOUDFLARE_KV_SIMULATION_KEY = 'cloudflare_kv_sim'; // Master key for simulated KV store
+
+        // Helper to get the full simulated KV store
+        function getSimulatedKV() {
+            try {
+                const data = localStorage.getItem(CLOUDFLARE_KV_SIMULATION_KEY);
+                return JSON.parse(data) || {};
+            } catch (e) {
+                console.error("Error parsing simulated KV data from localStorage:", e);
+                localStorage.removeItem(CLOUDFLARE_KV_SIMULATION_KEY); // Clear corrupted data
+                return {};
+            }
+        }
+
+        // Helper to put data into the simulated KV store
+        function putSimulatedKV(key, value) {
+            const kv = getSimulatedKV();
+            kv[key] = value;
+            localStorage.setItem(CLOUDFLARE_KV_SIMULATION_KEY, JSON.stringify(kv));
+            console.log(`Simulated KV: Put key "${key}".`);
+        }
+
+        // Helper to get data from the simulated KV store
+        function getSimulatedKVItem(key) {
+            const kv = getSimulatedKV();
+            const item = kv[key];
+            console.log(`Simulated KV: Get key "${key}" -`, item ? 'found' : 'not found');
+            return item;
+        }
+
+        // Simulated API Endpoint for User Operations
+        const simulatedCloudflareApi = {
+            async login(email, password) {
+                return new Promise(resolve => {
+                    setTimeout(() => { // Simulate network delay
+                        const userJson = getSimulatedKVItem(email.toLowerCase());
+                        const user = userJson ? JSON.parse(userJson) : null;
+                        if (user && user.password === password) { // In real app, hash and compare passwords securely!
+                            console.log('Simulated API Login Success for:', email);
+                            resolve({ success: true, user: user.profile, email: user.email, uid: user.uid });
+                        } else {
+                            console.log('Simulated API Login Failed for:', email);
+                            resolve({ success: false, message: 'Invalid username/email or password.' });
+                        }
+                    }, 500);
+                });
+            },
+            async register(email, password, minecraftUsername, accountName, minecraftEdition) { // Added minecraftEdition
+                return new Promise(resolve => {
+                    setTimeout(() => { // Simulate network delay
+                        const lowerCaseEmail = email.toLowerCase();
+                        if (getSimulatedKVItem(lowerCaseEmail)) {
+                            console.log('Simulated API Register Failed: User exists', email);
+                            resolve({ success: false, message: 'Account with this email already exists.' });
+                            return;
+                        }
+                        const uid = generateUID(lowerCaseEmail);
+                        const newUser = {
+                            email: lowerCaseEmail,
+                            password: password, // Still plaintext for testing
+                            uid: uid,
+                            profile: {
+                                minecraftUsername: minecraftUsername,
+                                minecraftEdition: minecraftEdition, // Store edition
+                                accountId: uid,
+                                accountName: accountName,
+                                avatar: ''
+                            }
+                        };
+                        putSimulatedKV(lowerCaseEmail, JSON.stringify(newUser));
+                        console.log('Simulated API Register Success for:', email);
+                        resolve({ success: true, user: newUser.profile, email: newUser.email, uid: newUser.uid });
+                    }, 500);
+                });
+            },
+            async updateProfile(email, newProfileData) {
+                return new Promise(resolve => {
+                    setTimeout(() => { // Simulate network delay
+                        const userJson = getSimulatedKVItem(email.toLowerCase());
+                        if (!userJson) {
+                            console.log('Simulated API Update Profile Failed: User not found', email);
+                            resolve({ success: false, message: 'User not found.' });
+                            return;
+                        }
+                        const user = JSON.parse(userJson);
+                        // Merge newProfileData, ensuring tickets array is not overwritten
+                        user.profile = { ...user.profile, ...newProfileData };
+                        putSimulatedKV(email.toLowerCase(), JSON.stringify(user));
+                        console.log('Simulated API Update Profile Success for:', email);
+                        resolve({ success: true, user: user.profile });
+                    }, 500);
+                });
+            },
+            async changePassword(email, currentPassword, newPassword) {
+                return new Promise(resolve => {
+                    setTimeout(() => {
+                        const userJson = getSimulatedKVItem(email.toLowerCase());
+                        if (!userJson) {
+                            resolve({ success: false, message: 'User not found.' });
+                            return;
+                        }
+                        const user = JSON.parse(userJson);
+                        if (user.password !== currentPassword) { // Direct comparison for simulation
+                            resolve({ success: false, message: 'Incorrect current password.' });
+                            return;
+                        }
+                        user.password = newPassword; // Update password (still plaintext)
+                        putSimulatedKV(email.toLowerCase(), JSON.stringify(user));
+                        resolve({ success: true, message: 'Password updated successfully!' });
+                    }, 500);
+                });
+            }
+        };
+
+
+        // --- User Authentication and Profile Management ---
+        const AUTH_SCREEN = document.getElementById('auth-screen');
+        const MAIN_AUTH_FORM = document.getElementById('auth-form-main');
+        const MAIN_AUTH_SUBMIT_BTN = document.getElementById('main-auth-submit-btn'); // Unified submit button
+        const TOGGLE_AUTH_MODE_BTN = document.getElementById('toggle-auth-mode-btn'); // Toggle between login/create
+        const MAIN_AUTH_EMAIL_INPUT = document.getElementById('auth-email-input');
+        const MAIN_AUTH_PASSWORD_INPUT = document.getElementById('auth-password-input');
+        const AUTH_MINECRAFT_USERNAME_INPUT = document.getElementById('auth-minecraft-username-input');
+        const AUTH_ACCOUNT_NAME_INPUT = document.getElementById('auth-account-name-input');
+        const AUTH_PLATFORM_SELECT = document.getElementById('auth-platform-select'); // New platform select
+        const RULES_CHECKBOX_CONTAINER = document.getElementById('rules-checkbox-container');
+        const AGREE_RULES_CHECKBOX = document.getElementById('agree-rules-checkbox');
+        const MAIN_AUTH_MESSAGE_ELEM = document.getElementById('auth-message-main');
+        const AUTH_WELCOME_MESSAGE = document.getElementById('auth-welcome-message');
+
+
+        const PROFILE_FORM = document.getElementById('profile-form');
+        const DISPLAY_EMAIL = document.getElementById('display-email');
+        const DISPLAY_MINECRAFT_USERNAME = document.getElementById('display-minecraft-username');
+        const DISPLAY_MINECRAFT_EDITION = document.getElementById('display-minecraft-edition'); // New display for edition
+        const DISPLAY_ACCOUNT_ID = document.getElementById('display-account-id');
+        const DISPLAY_ACCOUNT_NAME = document.getElementById('display-account-name');
+
+        const MINECRAFT_USERNAME_INPUT = document.getElementById('minecraft-username');
+        const ACCOUNT_NAME_INPUT = document.getElementById('account-name');
+
+        const PROFILE_MESSAGE_ELEM = document.getElementById('profile-message');
+        const AVATAR_UPLOAD_INPUT = document.getElementById('avatar-upload');
+        const PROFILE_IMAGE_ELEM = document.getElementById('profile-image');
+        const PROFILE_INITIAL_ELEM = document.getElementById('profile-initial');
+        const SIDEBAR_LOGOUT_BTN = document.getElementById('sidebar-logout-btn');
+
+        const HEADER_PROFILE_DISPLAY = document.getElementById('header-profile-display');
+        const HEADER_PROFILE_AVATAR = document.getElementById('header-profile-avatar');
+        const HEADER_PROFILE_INITIAL = document.getElementById('header-profile-initial');
+        const HEADER_PROFILE_IMAGE = document.getElementById('header-profile-image');
+        const PROFILE_DROPDOWN_MENU = document.getElementById('profile-dropdown-menu');
+
+        const CHANGE_PASSWORD_FORM = document.getElementById('change-password-form');
+        const CURRENT_PASSWORD_INPUT = document.getElementById('current-password');
+        const NEW_PASSWORD_INPUT = document.getElementById('new-password');
+        const CONFIRM_NEW_PASSWORD_INPUT = document.getElementById('confirm-new-password');
+        const CHANGE_PASSWORD_MESSAGE = document.getElementById('change-password-message');
+
+
+        let currentUser = null; // Stores email, uid
+        let userProfile = null; // Stores detailed profile data
+
+        // Simple UID generator (for demo purposes)
+        function generateUID(email) {
+            return 'user_' + btoa(email).replace(/=/g, '').substring(0, 10) + '_' + Date.now().toString().slice(-4);
+        }
+
+        // --- Auth Mode Toggle (Login / Create Account) ---
+        let isCreateMode = false; // Initial state: Login
+
+        function setAuthMode(mode) {
+            isCreateMode = mode;
+            MAIN_AUTH_MESSAGE_ELEM.textContent = ''; // Clear messages
+
+            // Hide all create-account-specific fields first
+            AUTH_MINECRAFT_USERNAME_INPUT.style.display = 'none';
+            AUTH_ACCOUNT_NAME_INPUT.style.display = 'none';
+            AUTH_PLATFORM_SELECT.style.display = 'none';
+            document.querySelector('label[for="auth-platform-select"]').style.display = 'none'; // Hide label too
+            RULES_CHECKBOX_CONTAINER.style.display = 'none';
+            AUTH_MINECRAFT_USERNAME_INPUT.removeEventListener('input', forceDotPrefix); // Remove listener when not in bedrock create mode
+
+
+            if (isCreateMode) {
+                AUTH_WELCOME_MESSAGE.textContent = 'Thanks for Joining!';
+                AUTH_MINECRAFT_USERNAME_INPUT.style.display = 'block';
+                AUTH_ACCOUNT_NAME_INPUT.style.display = 'block';
+                AUTH_PLATFORM_SELECT.style.display = 'block';
+                document.querySelector('label[for="auth-platform-select"]').style.display = 'block';
+                RULES_CHECKBOX_CONTAINER.style.display = 'flex'; // Show rules checkbox
+                MAIN_AUTH_SUBMIT_BTN.textContent = 'Register Account';
+                TOGGLE_AUTH_MODE_BTN.textContent = 'Have an account? Login'; // Changed text
+            } else {
+                AUTH_WELCOME_MESSAGE.textContent = 'Welcome Back!';
+                MAIN_AUTH_SUBMIT_BTN.textContent = 'Login';
+                TOGGLE_AUTH_MODE_BTN.textContent = 'Don\'t have an account? Create one'; // Changed text
+            }
+            // Clear inputs when switching modes
+            MAIN_AUTH_EMAIL_INPUT.value = '';
+            MAIN_AUTH_PASSWORD_INPUT.value = '';
+            AUTH_MINECRAFT_USERNAME_INPUT.value = '';
+            AUTH_ACCOUNT_NAME_INPUT.value = '';
+            AUTH_PLATFORM_SELECT.value = ''; // Reset platform select
+            AGREE_RULES_CHECKBOX.checked = false;
+        }
+
+        // Event listener for platform selection
+        AUTH_PLATFORM_SELECT.addEventListener('change', () => {
+            if (AUTH_PLATFORM_SELECT.value === 'bedrock') {
+                // Prepend and make non-removable dot for Bedrock
+                AUTH_MINECRAFT_USERNAME_INPUT.value = '.';
+                AUTH_MINECRAFT_USERNAME_INPUT.addEventListener('input', forceDotPrefix);
+            } else {
+                AUTH_MINECRAFT_USERNAME_INPUT.removeEventListener('input', forceDotPrefix);
+                AUTH_MINECRAFT_USERNAME_INPUT.value = ''; // Clear if not bedrock
+            }
+        });
+
+        // Function to force the dot prefix for Bedrock usernames
+        function forceDotPrefix() {
+            if (AUTH_PLATFORM_SELECT.value === 'bedrock' && !AUTH_MINECRAFT_USERNAME_INPUT.value.startsWith('.')) {
+                AUTH_MINECRAFT_USERNAME_INPUT.value = '.' + AUTH_MINECRAFT_USERNAME_INPUT.value.replace(/^\.+/, ''); // Ensure only one dot at start
+            }
+        }
+
+
+        TOGGLE_AUTH_MODE_BTN.addEventListener('click', (e) => {
+            e.preventDefault();
+            setAuthMode(!isCreateMode);
+        });
+
+        MAIN_AUTH_SUBMIT_BTN.addEventListener('click', async (e) => {
+            e.preventDefault();
+            MAIN_AUTH_MESSAGE_ELEM.textContent = '';
+
+            const email = MAIN_AUTH_EMAIL_INPUT.value;
+            const password = MAIN_AUTH_PASSWORD_INPUT.value;
+
+            if (isCreateMode) {
+                // Register logic
+                const minecraftUsername = AUTH_MINECRAFT_USERNAME_INPUT.value.trim();
+                const accountName = AUTH_ACCOUNT_NAME_INPUT.value.trim();
+                const minecraftEdition = AUTH_PLATFORM_SELECT.value; // Get selected edition
+
+                if (!email || !password || !minecraftUsername || !accountName || !minecraftEdition) {
+                    showCustomMessage(MAIN_AUTH_MESSAGE_ELEM, 'Please fill all required fields for registration (including Minecraft Edition).', 'error');
+                    return;
+                }
+                if (!AGREE_RULES_CHECKBOX.checked) {
+                    showCustomMessage(MAIN_AUTH_MESSAGE_ELEM, 'You must agree to the Minecraft Server Rules to create an account.', 'error');
+                    return;
+                }
+
+                const response = await simulatedCloudflareApi.register(email, password, minecraftUsername, accountName, minecraftEdition); // Pass edition
+
+                if (response.success) {
+                    currentUser = { email: response.email, uid: response.uid };
+                    userProfile = response.user;
+                    sessionStorage.setItem('current_auth_email', email);
+                    handleSuccessfulAuth();
+                    showCustomMessage(MAIN_AUTH_MESSAGE_ELEM, 'Account created successfully!', 'success');
+                } else {
+                    showCustomMessage(MAIN_AUTH_MESSAGE_ELEM, response.message, 'error');
+                }
+
+            } else {
+                // Login logic
+                const response = await simulatedCloudflareApi.login(email, password);
+
+                if (response.success) {
+                    currentUser = { email: response.email, uid: response.uid };
+                    userProfile = response.user;
+                    sessionStorage.setItem('current_auth_email', email);
+                    handleSuccessfulAuth();
+                    showCustomMessage(MAIN_AUTH_MESSAGE_ELEM, 'Login successful!', 'success');
+                } else {
+                    showCustomMessage(MAIN_AUTH_MESSAGE_ELEM, response.message, 'error');
+                }
+            }
+        });
+
+
+        // What happens after successful login/create
+        function handleSuccessfulAuth() {
+            AUTH_SCREEN.style.display = 'none';
+            document.getElementById('main-content-wrapper').style.display = 'block';
+            console.log('Auth successful: showing main content.');
+            renderProfile(); // Populate profile fields and header profile
+            renderPlugins(pluginsData); // Initial render of sorted plugins
+            showSection('server-info-content'); // Default to SERVER DETAILS on home
+            fetchServerStatus(); // Fetch server status immediately
+        }
+
+        // Render profile details in Account Settings and header
+        function renderProfile() {
+            if (currentUser && userProfile) {
+                // Display fields in Account Settings
+                DISPLAY_EMAIL.textContent = currentUser.email;
+                DISPLAY_MINECRAFT_USERNAME.textContent = userProfile.minecraftUsername || 'N/A';
+                DISPLAY_MINECRAFT_EDITION.textContent = (userProfile.minecraftEdition === 'java' ? 'Java Edition' : (userProfile.minecraftEdition === 'bedrock' ? 'Bedrock Edition' : 'N/A')); // Display edition
+                DISPLAY_ACCOUNT_ID.textContent = currentUser.uid || 'N/A';
+                DISPLAY_ACCOUNT_NAME.textContent = userProfile.accountName || 'N/A';
+
+                // Input fields (for editing) in Account Settings
+                MINECRAFT_USERNAME_INPUT.value = userProfile.minecraftUsername || '';
+                ACCOUNT_NAME_INPUT.value = userProfile.accountName || '';
+
+                // Render header profile picture
+                updateAvatarDisplay(userProfile.avatar, currentUser.email);
+            }
+        }
+
+        // Update avatar display (large for profile section, small for header)
+        function updateAvatarDisplay(avatarDataUrl, email) {
+            // Main profile avatar
+            const mainProfileImage = document.getElementById('profile-image');
+            const mainProfileInitial = document.getElementById('profile-initial');
+            if (avatarDataUrl) {
+                mainProfileImage.src = avatarDataUrl;
+                mainProfileImage.style.display = 'block';
+                mainProfileInitial.style.display = 'none';
+            } else {
+                mainProfileImage.style.display = 'none';
+                mainProfileInitial.style.display = 'flex';
+                mainProfileInitial.textContent = email ? email.charAt(0).toUpperCase() : '?';
+            }
+
+            // Header profile avatar
+            if (HEADER_PROFILE_IMAGE && HEADER_PROFILE_INITIAL) {
+                if (avatarDataUrl) {
+                    HEADER_PROFILE_IMAGE.src = avatarDataUrl;
+                    HEADER_PROFILE_IMAGE.style.display = 'block';
+                    HEADER_PROFILE_INITIAL.style.display = 'none';
+                } else {
+                    HEADER_PROFILE_IMAGE.style.display = 'none';
+                    HEADER_PROFILE_INITIAL.style.display = 'flex';
+                    HEADER_PROFILE_INITIAL.textContent = email ? email.charAt(0).toUpperCase() : '?';
+                }
+            }
+        }
+
+        // Handle profile form submission (saving to simulated Cloudflare KV)
+        PROFILE_FORM.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            if (!currentUser || !userProfile) {
+                showCustomMessage(PROFILE_MESSAGE_ELEM, 'Please log in first.', 'error');
+                return;
+            }
+
+            const updatedProfile = {
+                minecraftUsername: MINECRAFT_USERNAME_INPUT.value,
+                accountName: ACCOUNT_NAME_INPUT.value,
+                avatar: userProfile.avatar // Retain current avatar unless changed via file input
+            };
+
+            const response = await simulatedCloudflareApi.updateProfile(currentUser.email, updatedProfile);
+
+            if (response.success) {
+                userProfile = response.user; // Update local profile with confirmed changes
+                renderProfile(); // Re-render to update display fields and header
+                showCustomMessage(PROFILE_MESSAGE_ELEM, 'Profile saved successfully!', 'success');
+            } else {
+                showCustomMessage(PROFILE_MESSAGE_ELEM, response.message, 'error');
+            }
+        });
+
+        // Handle avatar upload (saving to simulated Cloudflare KV)
+        AVATAR_UPLOAD_INPUT.addEventListener('change', async (e) => {
+            const file = e.target.files[0];
+            if (file && currentUser && userProfile) {
+                const reader = new FileReader();
+                reader.onload = async (event) => {
+                    const avatarDataUrl = event.target.result; // Data URL of the image
+                    const updatedProfile = { ...userProfile, avatar: avatarDataUrl }; // Update avatar in profile
+
+                    const response = await simulatedCloudflareApi.updateProfile(currentUser.email, updatedProfile);
+
+                    if (response.success) {
+                        userProfile = response.user; // Update local profile
+                        updateAvatarDisplay(userProfile.avatar, currentUser.email);
+                        showCustomMessage(PROFILE_MESSAGE_ELEM, 'Profile picture updated!', 'success');
+                    } else {
+                        showCustomMessage(PROFILE_MESSAGE_ELEM, response.message, 'error');
+                    }
+                };
+                reader.readAsDataURL(file); // Read file as Data URL
+            } else if (!currentUser) {
+                showCustomMessage(PROFILE_MESSAGE_ELEM, 'Please log in to upload an avatar.', 'error');
+            }
+        });
+
+        // Toggle profile dropdown in header
+        if (HEADER_PROFILE_AVATAR) {
+            HEADER_PROFILE_AVATAR.addEventListener('click', (e) => {
+                e.stopPropagation(); // Prevent click from closing immediately
+                PROFILE_DROPDOWN_MENU.classList.toggle('active');
+            });
+            // Close dropdown if clicked outside
+            document.addEventListener('click', (e) => {
+                if (!HEADER_PROFILE_DISPLAY.contains(e.target)) {
+                    PROFILE_DROPDOWN_MENU.classList.remove('active');
+                }
+            });
+        }
+        function toggleProfileDropdown() {
+             PROFILE_DROPDOWN_MENU.classList.toggle('active');
+        }
+
+        // Handle Change Password Form
+        CHANGE_PASSWORD_FORM.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            CHANGE_PASSWORD_MESSAGE.textContent = '';
+            const currentPassword = CURRENT_PASSWORD_INPUT.value;
+            const newPassword = NEW_PASSWORD_INPUT.value;
+            const confirmNewPassword = CONFIRM_NEW_PASSWORD_INPUT.value;
+
+            if (!currentPassword || !newPassword || !confirmNewPassword) {
+                showCustomMessage(CHANGE_PASSWORD_MESSAGE, 'All password fields are required.', 'error');
+                return;
+            }
+            if (newPassword.length < 6) { // Example strength check
+                showCustomMessage(CHANGE_PASSWORD_MESSAGE, 'New password must be at least 6 characters long.', 'error');
+                return;
+            }
+            if (newPassword !== confirmNewPassword) {
+                showCustomMessage(CHANGE_PASSWORD_MESSAGE, 'New password and confirmation do not match.', 'error');
+                return;
+            }
+
+            const response = await simulatedCloudflareApi.changePassword(currentUser.email, currentPassword, newPassword);
+
+            if (response.success) {
+                showCustomMessage(CHANGE_PASSWORD_MESSAGE, response.message, 'success');
+                // Clear fields on success
+                CURRENT_PASSWORD_INPUT.value = '';
+                NEW_PASSWORD_INPUT.value = '';
+                CONFIRM_NEW_PASSWORD_INPUT.value = '';
+            } else {
+                showCustomMessage(CHANGE_PASSWORD_MESSAGE, response.message, 'error');
+            }
+        });
+
+
+        // Logout function
+        function logoutUser() {
+            currentUser = null;
+            userProfile = null;
+            sessionStorage.removeItem('current_auth_email'); // Clear auth session
+            console.log('User logged out. Clearing session.');
+
+            AUTH_SCREEN.style.display = 'flex'; // Show auth screen
+            document.getElementById('main-content-wrapper').style.display = 'none'; // Hide main content
+            showCustomMessage(MAIN_AUTH_MESSAGE_ELEM, 'You have been logged out.', 'success');
+            // Reset auth form fields and set to login mode
+            setAuthMode(false); // Reset to login mode
+            toggleSidebar(); // Close sidebar if open
+        }
+        SIDEBAR_LOGOUT_BTN.addEventListener('click', logoutUser);
+
+
+        // --- UI Navigation & Sidebar Logic ---
+        const SIDEBAR = document.getElementById('sidebar');
+        const MAIN_CONTENT_WRAPPER = document.getElementById('main-content-wrapper');
+        const OVERLAY = document.querySelector('.overlay');
+        const SIDEBAR_NAV_LINKS = document.querySelectorAll('#sidebar nav a');
+        const HOMEPAGE_NAV_SECTION = document.getElementById('homepage-nav-section'); // The section with the 3 main buttons
+        const DYNAMIC_CONTENT_AREA = document.getElementById('dynamic-content-area'); // The container for content below buttons
+        const ALL_CONTENT_SECTIONS = document.querySelectorAll('#dynamic-content-area > .content-section'); // All sections that live *inside* dynamic-content-area
+
+        function toggleSidebar() {
+            SIDEBAR.classList.toggle('open');
+            MAIN_CONTENT_WRAPPER.classList.toggle('sidebar-open');
+            OVERLAY.classList.toggle('active');
+        }
+
+        // Function to show a specific content section and hide others
+        function showSection(sectionId) {
+            ALL_CONTENT_SECTIONS.forEach(section => {
+                section.classList.remove('active');
+            });
+
+            // Adjust homepage nav section visibility based on the type of content
+            if (['server-info-content', 'plugins-content', 'how-to-play-content'].includes(sectionId)) {
+                HOMEPAGE_NAV_SECTION.style.display = 'flex'; // Show the main buttons
+                document.getElementById(sectionId).classList.add('active'); // Show the requested content below
+            } else {
+                HOMEPAGE_NAV_SECTION.style.display = 'none'; // Hide the main buttons
+                document.getElementById(sectionId).classList.add('active'); // Show the requested content
+            }
+
+            // Update active class in sidebar nav
+            SIDEBAR_NAV_LINKS.forEach(link => {
+                link.classList.remove('active');
+                if (link.dataset.section === sectionId) {
+                    link.classList.add('active');
+                }
+                // Special case for 'Home' in sidebar: activate if any of the main 3 are active
+                if (link.dataset.section === "server-info-content" && ['server-info-content', 'plugins-content', 'how-to-play-content'].includes(sectionId)) {
+                    link.classList.add('active');
+                }
+            });
+        }
+
+        // Add click listeners to sidebar navigation links
+        SIDEBAR_NAV_LINKS.forEach(link => {
+            // Check if the link should open an external URL (like Discord/Instagram)
+            if (link.href && link.target === '_blank') {
+                link.addEventListener('click', (e) => {
+                    // Do nothing, let the browser handle the target="_blank"
+                });
+            } else if (link.dataset.section) {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    showSection(link.dataset.section);
+                    toggleSidebar(); // Close sidebar after navigation
+                });
+            }
+        });
+
+
+        // --- Server Status Script (Directly provided logic) ---
+        const serverIP = "mc1524209.fmcs.cloud"; // Your FreeMcServer IP
+
+        async function fetchServerStatus() {
+            const statusDiv = document.getElementById("server-status");
+            const playersDiv = document.getElementById("player-count");
+            const onlinePlayersList = document.getElementById("online-players-list");
+            const serverControlOptions = document.getElementById('server-control-options');
+            serverControlOptions.innerHTML = ''; // Clear previous buttons
+
+            // Update static IP/Port displays (always the same)
+            document.getElementById("server-ip").textContent = serverIP;
+            document.getElementById("server-port").textContent = "38762"; // Hardcoded as requested
+
+            try {
+                const res = await fetch(`https://api.mcsrvstat.us/2/${serverIP}`);
+                const data = await res.json();
+
+                if (!data || typeof data.online === "undefined") {
+                    statusDiv.innerHTML = "?? Error checking server status.";
+                    statusDiv.className = "status-offline";
+                    playersDiv.innerHTML = "";
+                    onlinePlayersList.innerHTML = '<li>Error: Could not retrieve server status.</li>';
+                    serverControlOptions.innerHTML = `<a href="https://freemcserver.net/server/1524209" target="_blank"><button style="background-color: var(--button-primary);"><i class="fas fa-play"></i> Start Server</button></a>`;
+                    return;
+                }
+
+                if (!data.online) {
+                    statusDiv.innerHTML = "?? Offline";
+                    statusDiv.className = "status-offline";
+                    playersDiv.innerHTML = "";
+                    onlinePlayersList.innerHTML = '<li>Server is offline. Invalid player names (server does not exist to provide names).</li>';
+                    serverControlOptions.innerHTML = `<a href="https://freemcserver.net/server/1524209" target="_blank"><button style="background-color: var(--button-primary);"><i class="fas fa-play"></i> Start Server</button></a>`;
+                } else {
+                    statusDiv.innerHTML = "?? Online";
+                    statusDiv.className = "status-online";
+                    playersDiv.innerHTML = `?? ${data.players.online}/${data.players.max} Players`;
+                    serverControlOptions.innerHTML = `<button style="background-color: var(--button-red);" disabled><i class="fas fa-stop"></i> Server Running</button>`;
+
+                    // Display online players
+                    let playersListHtml = '';
+                    if (data.players && data.players.list && data.players.list.length > 0) {
+                        playersListHtml = data.players.list.map(p => `<li><span>${p}</span></li>`).join('');
+                    } else {
+                        playersListHtml = '<li>No players currently online.</li>';
+                    }
+                    onlinePlayersList.innerHTML = playersListHtml;
+                }
+            } catch (error) {
+                console.error("Fetch error:", error);
+                statusDiv.innerHTML = "?? Network Error: Cannot reach API.";
+                statusDiv.className = "status-offline";
+                playersDiv.innerHTML = "";
+                onlinePlayersList.innerHTML = '<li>Network error. Please check your connection.</li>';
+                serverControlOptions.innerHTML = `<a href="https://freemcserver.net/server/1524209" target="_blank"><button style="background-color: var(--button-primary);"><i class="fas fa-play"></i> Start Server</button></a>`;
+            }
+        }
+
+        fetchServerStatus(); // Initial call
+        setInterval(fetchServerStatus, 5000); // Repeat every 5 seconds
+
+
+        // --- Copy-to-Clipboard ---
+        function copyToClipboard(id) {
+            const text = document.getElementById(id).innerText;
+            navigator.clipboard.writeText(text).then(() => {
+                showCustomAlert('Copied!', 'Text copied to clipboard: ' + text);
+            }).catch(err => {
+                console.error('Failed to copy text: ', err);
+                showCustomAlert('Error', 'Failed to copy text.');
+            });
+        }
+
+        // --- Plugin Data & Render Logic ---
+        const pluginsData = [
+            { name: "EssentialsX", description: "Core plugin for server management, homes, warps, kits, and more.", videoLink: "https://www.youtube.com/embed/dQw4w9WgXcQ", detailsLink: "https://essentialsx.net/wiki.html", status: "working" },
+            { name: "LuckPerms", description: "Powerful permissions plugin with a web editor.", videoLink: "", detailsLink: "https://luckperms.net/", status: "working" },
+            { name: "WorldEdit", description: "Fast and easy to use in-game world editor.", videoLink: "https://www.youtube.com/embed/aYd2I9B5G60", detailsLink: "https://enginehub.org/worldedit/", status: "working" },
+            { name: "GriefPrevention", description: "Prevents griefing and protects player builds with land claims.", videoLink: "https://www.youtube.com/embed/p_G-o2r9D2s", detailsLink: "https://www.spigotmc.org/resources/griefprevention.1884/", status: "working" },
+            { name: "PlaceholderAPI", description: "Adds placeholders to plugins, allowing dynamic text display.", videoLink: "", detailsLink: "https://www.spigotmc.org/resources/placeholderapi.6245/", status: "working" },
+            { name: "Vault", description: "A permissions, chat, & economy API to allow plugins to hook into.", videoLink: "https://www.youtube.com/embed/lIeXvD3xG4w", detailsLink: "https://www.spigotmc.org/resources/vault.34315/", status: "working" },
+            { name: "EconomyTaxerWeb", description: "This custom plugin is not made by CraftOne. Unsupported version by Ansh_2613 and i._Sakshamm.", videoLink: "", detailsLink: "", status: "non-working", problem: "This custom plugin is not made by CraftOne. Unsupported version by Ansh_2613 and i._Sakshamm." }, // Updated problem
+            { name: "Movecraft", description: "Allows players to build and pilot custom ships and vehicles.", videoLink: "https://www.youtube.com/embed/some_movecraft_video", detailsLink: "https://www.spigotmc.org/resources/movecraft.20364/", status: "non-working", problem: "Unsupported version." } // Updated problem
+            // Add more plugins here with their status
+        ];
+
+        const pluginSubNavButtons = document.querySelectorAll('#plugins-content .player-sub-nav button');
+        let currentPluginFilter = "all-plugins"; // Default filter
+
+        function renderPlugins(pluginsToRender) {
+            const pluginListElement = document.getElementById("plugin-list");
+            pluginListElement.innerHTML = ''; // Clear existing list
+
+            let filteredPlugins = pluginsToRender;
+
+            if (currentPluginFilter === "non-working-plugins") {
+                filteredPlugins = pluginsToRender.filter(p => p.status === "non-working").sort((a,b) => a.name.localeCompare(b.name));
+            } else { // "all-plugins" - sort working first, then non-working
+                const workingPlugins = pluginsToRender.filter(p => p.status === "working").sort((a,b) => a.name.localeCompare(b.name));
+                const nonWorkingPlugins = pluginsToRender.filter(p => p.status === "non-working").sort((a,b) => a.name.localeCompare(b.name));
+                filteredPlugins = [...workingPlugins, ...nonWorkingPlugins];
+            }
+
+
+            if (filteredPlugins.length === 0) {
+                pluginListElement.innerHTML = '<li style="text-align: center; color: #ccc; padding: 20px;">No plugins found matching your criteria.</li>';
+                return;
+            }
+
+            filteredPlugins.forEach(plugin => {
+                const li = document.createElement("li");
+                let videoHtml = '';
+                if (plugin.videoLink) {
+                    videoHtml = `
+                        <div class="plugin-video">
+                            <iframe src="${plugin.videoLink}"
+                                    title="${plugin.name} Tutorial"
+                                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                                    allowfullscreen>
+                            </iframe>
+                        </div>`;
+                } else {
+                    videoHtml = `
+                        <div class="plugin-video placeholder">
+                            No tutorial video available for this plugin.
+                        </div>`;
+                }
+
+                let problemMessageHtml = '';
+                if (plugin.status === "non-working" && plugin.problem) {
+                    problemMessageHtml = `<p class="problem-message">Problem: ${plugin.problem}</p>`;
+                    li.classList.add('non-working-plugin'); // Add class for styling
+                }
+
+                li.innerHTML = `
+                    <h3>${plugin.name}</h3>
+                    <p class="description">${plugin.description}</p>
+                    ${problemMessageHtml}
+                    ${videoHtml}
+                    <div class="plugin-links">
+                        ${plugin.detailsLink ? `<a class="plugin-link-btn" href="${plugin.detailsLink}" target="_blank">
+                            <i class="fas fa-info-circle"></i> Details
+                        </a>` : ''}
+                    </div>
+                `;
+                pluginListElement.appendChild(li);
+            });
+        }
+
+        // Plugin sub-navigation click handlers
+        pluginSubNavButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                pluginSubNavButtons.forEach(btn => btn.classList.remove('active'));
+                button.classList.add('active');
+                currentPluginFilter = button.dataset.pluginSubSection;
+                renderPlugins(pluginsData); // Re-render with new filter
+            });
+        });
+
+
+        // Plugin Search Filter (filters the currently displayed set)
+        const searchInput = document.getElementById("plugin-search");
+        searchInput.addEventListener("input", function () {
+            const filter = this.value.toLowerCase();
+            let pluginsToSearch = pluginsData;
+            // The sorting logic in renderPlugins already handles the "all-plugins" view
+            // and the "non-working-plugins" filter.
+            // We only need to pass the full pluginsData to renderPlugins and let it sort/filter.
+
+            const filteredPlugins = pluginsToSearch.filter(plugin =>
+                plugin.name.toLowerCase().includes(filter) ||
+                plugin.description.toLowerCase().includes(filter)
+            );
+            renderPlugins(filteredPlugins); // Always re-render based on current filter and search
+        });
+
+        // --- Players Section Logic (ONLY PLAYERS FROM IMAGE) ---
+        const playerSubNavButtons = document.querySelectorAll('#players-content .player-sub-nav button');
+        const playerSubContents = document.querySelectorAll('#players-content .player-sub-content');
+        const allPlayersList = document.getElementById('all-players-list');
+        const allPlayersSearch = document.getElementById('all-players-search');
+        const richestPlayersList = document.getElementById('richest-players-list');
+        const taxedPlayersList = document.getElementById('taxed-players-list');
+
+        // This data now STRICTLY reflects players from the image with CORRECTED balances
+        const allPlayersData = [
+            { name: 'Ansh', status: 'Online', edition: 'Java', balance: 1673671.60, taxPaid: 171693.69 },
+            { name: '.Atharva3044', status: 'Online', edition: 'Bedrock', balance: 879.97, taxPaid: 23780.87 }, // Exchanged balance
+            { name: '.Atharva4617', status: 'Offline', edition: 'Bedrock', balance: 893572.56, taxPaid: 20683 }, // Exchanged balance
+        ];
+
+        // Ensure these are derived *after* allPlayersData is complete and sorted.
+        const topRichestData = [...allPlayersData].sort((a, b) => b.balance - a.balance).slice(0, 3);
+        const topTaxedData = [...allPlayersData].sort((a, b) => b.taxPaid - a.taxPaid).slice(0, 3);
+
+
+        function showPlayerSubSection(sectionId) {
+            playerSubContents.forEach(content => {
+                content.classList.remove('active');
+            });
+            playerSubNavButtons.forEach(button => {
+                button.classList.remove('active');
+            });
+
+            document.getElementById(sectionId).classList.add('active');
+            document.querySelector(`[data-player-sub-section="${sectionId.replace('-content', '')}"]`).classList.add('active');
+
+            if (sectionId === 'all-players-content') {
+                renderAllPlayers(allPlayersData); // Render all players on activation
+            } else if (sectionId === 'top-richest-content') {
+                renderRichestPlayers();
+            } else if (sectionId === 'top-taxed-content') {
+                renderTaxedPlayers();
+            }
+        }
+
+        function renderAllPlayers(playersToRender) {
+            allPlayersList.innerHTML = '';
+            if (playersToRender.length === 0) {
+                allPlayersList.innerHTML = '<li>No players found.</li>';
+                return;
+            }
+            playersToRender.forEach(player => {
+                const li = document.createElement('li');
+                // Displaying only name, status, and edition as requested
+                li.innerHTML = `<strong>${player.name}:</strong> <span>${player.status}, Edition: ${player.edition}</span>`;
+                allPlayersList.appendChild(li);
+            });
+        }
+
+        function renderRichestPlayers() {
+            richestPlayersList.innerHTML = '';
+            topRichestData.forEach((player, index) => {
+                const li = document.createElement('li');
+                li.innerHTML = `<strong>${index + 1}. ${player.name}:</strong> <span>$${player.balance.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>`;
+                richestPlayersList.appendChild(li);
+            });
+        }
+
+        function renderTaxedPlayers() {
+            taxedPlayersList.innerHTML = '';
+            topTaxedData.forEach((player, index) => {
+                const li = document.createElement('li');
+                li.innerHTML = `<strong>${index + 1}. ${player.name}:</strong> <span>$${player.taxPaid.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>`;
+                taxedPlayersList.appendChild(li);
+            });
+        }
+
+
+        playerSubNavButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                const targetSection = button.dataset.playerSubSection + '-content';
+                showPlayerSubSection(targetSection);
+            });
+        });
+
+        // Player search functionality
+        allPlayersSearch.addEventListener('input', function() {
+            const filter = this.value.toLowerCase();
+            const filteredPlayers = allPlayersData.filter(player =>
+                player.name.toLowerCase().includes(filter)
+            );
+            renderAllPlayers(filteredPlayers);
+        });
+
+
+        // --- Contact Us Form Submission ---
+        const contactUsForm = document.getElementById("contact-us-form");
+        const contactUsStatus = document.getElementById("contact-us-status");
+
+        contactUsForm.addEventListener("submit", function (e) {
+            e.preventDefault();
+
+            const minecraftUsername = document.getElementById("contact-minecraft-username").value.trim();
+            const discordId = document.getElementById("contact-discord-id").value.trim();
+            const message = document.getElementById("contact-message").value.trim();
+
+            if (!minecraftUsername || !discordId || !message) {
+                contactUsStatus.innerText = "?? Please fill in all required fields.";
+                contactUsStatus.classList.add('error');
+                return;
+            }
+
+            const fullMessage = `?? **NEW CONTACT US MESSAGE** ??
+**Submitted By Email:** ${currentUser ? currentUser.email : 'Not Logged In'} (UID: ${currentUser ? currentUser.uid : 'N/A'})
+**Minecraft User:** ${minecraftUsername}
+**Discord ID:** ${discordId}
+**Message:**
+${message}`;
+
+            fetch("https://discordapp.com/api/webhooks/1383347956182290462/b1k7PVanxmP6InWfH9k4Npj7WNP9dUM-nD6xXRZGZwFOsODahyDoBnxlmNdGCCyLDetz", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ content: fullMessage })
+            })
+            .then(res => {
+                if (res.ok) {
+                    contactUsStatus.innerText = "? Message sent successfully! We'll get back to you soon.";
+                    contactUsStatus.classList.remove('error');
+                    contactUsForm.reset();
+                } else {
+                    contactUsStatus.innerText = "? Failed to send. Try again later.";
+                    contactUsStatus.classList.add('error');
+                }
+            })
+            .catch(error => {
+                console.error("Contact form error:", error);
+                contactUsStatus.innerText = "? Error sending message.";
+                contactUsStatus.classList.add('error');
+            });
+        });
+
+
+        // --- Theme Panel Logic ---
+        function applyTheme() {
+            const root = document.documentElement.style;
+            const savedBoxColor = localStorage.getItem("--box-color");
+            const savedGlowColor = localStorage.getItem("saved-glow-color");
+            const savedGlowSpeed = localStorage.getItem("--glow-speed");
+            const savedGlowBrightness = localStorage.getItem("--glow-brightness");
+            const savedBgTheme = localStorage.getItem("--bg-theme");
+            const savedGlowEnabled = localStorage.getItem("--glow-enabled");
+            const savedTextLight = localStorage.getItem("--text-light");
+            const savedAccentGreen = localStorage.getItem("--accent-green");
+            const savedAccentBlue = localStorage.getItem("--accent-blue");
+
+
+            if (savedBoxColor) root.setProperty('--box-color', savedBoxColor);
+            if (savedGlowSpeed) root.setProperty('--glow-speed', savedGlowSpeed);
+            if (savedGlowBrightness) root.setProperty('--glow-brightness', savedGlowBrightness);
+            if (savedBgTheme) root.setProperty('--bg-theme', savedBgTheme);
+            if (savedTextLight) root.setProperty('--text-light', savedTextLight);
+            if (savedAccentGreen) root.setProperty('--accent-green', savedAccentGreen);
+            if (savedAccentBlue) root.setProperty('--accent-blue', savedAccentBlue);
+
+            // Apply glow based on toggle state
+            const glowToggleCheckbox = document.getElementById("glowToggle");
+            if (glowToggleCheckbox) {
+                glowToggleCheckbox.checked = (savedGlowEnabled === "true");
+                root.setProperty('--glow-color', (savedGlowEnabled === "true" && savedGlowColor) ? savedGlowColor : "transparent");
+            } else {
+                root.setProperty('--glow-color', (savedGlowEnabled === "true" && savedGlowColor) ? savedGlowColor : "transparent");
+            }
+
+
+            // Set input values to current theme values
+            document.getElementById("boxColor").value = savedBoxColor || getComputedStyle(document.documentElement).getPropertyValue('--box-color');
+            document.getElementById("glowColor").value = savedGlowColor || getComputedStyle(document.documentElement).getPropertyValue('--accent-green');
+            document.getElementById("glowSpeed").value = parseFloat((savedGlowSpeed || '3s').replace('s', ''));
+            document.getElementById("glowBrightness").value = parseFloat(savedGlowBrightness || '0.6');
+            document.getElementById("bgTheme").value = (savedBgTheme && !savedBgTheme.startsWith("url('") && !savedBgTheme.startsWith("linear-gradient")) ? savedBgTheme : ''; // Clear if complex gradient/url for input
+            document.getElementById("textLightColor").value = savedTextLight || getComputedStyle(document.documentElement).getPropertyValue('--text-light');
+            document.getElementById("accentGreenColor").value = savedAccentGreen || getComputedStyle(document.documentElement).getPropertyValue('--accent-green');
+            document.getElementById("accentBlueColor").value = savedAccentBlue || getComputedStyle(document.documentElement).getPropertyValue('--accent-blue');
+        }
+
+        function saveTheme() {
+            const root = document.documentElement.style;
+            const box = document.getElementById("boxColor").value;
+            const glow = document.getElementById("glowColor").value;
+            const speed = document.getElementById("glowSpeed").value + "s";
+            const brightness = document.getElementById("glowBrightness").value;
+            let bg = document.getElementById("bgTheme").value.trim();
+            const enableGlow = document.getElementById("glowToggle").checked;
+            const textLight = document.getElementById("textLightColor").value;
+            const accentGreen = document.getElementById("accentGreenColor").value;
+            const accentBlue = document.getElementById("accentBlueColor").value;
+
+
+            localStorage.setItem("--box-color", box);
+            localStorage.setItem("saved-glow-color", glow); /* Store the glow color separately */
+            localStorage.setItem("--glow-speed", speed);
+            localStorage.setItem("--glow-brightness", brightness);
+            localStorage.setItem("--bg-theme", bg);
+            localStorage.setItem("--glow-enabled", enableGlow);
+            localStorage.setItem("--text-light", textLight);
+            localStorage.setItem("--accent-green", accentGreen);
+            localStorage.setItem("--accent-blue", accentBlue);
+
+
+            root.setProperty("--box-color", box);
+            root.setProperty("--glow-color", enableGlow ? glow : "transparent");
+            root.setProperty("--glow-speed", speed);
+            root.setProperty("--glow-brightness", brightness);
+            root.setProperty("--bg-theme", bg);
+            root.setProperty("--text-light", textLight);
+            root.setProperty("--accent-green", accentGreen);
+            root.setProperty("--accent-blue", accentBlue);
+
+
+            showCustomMessage(document.getElementById('theme-settings-content').querySelector('h2'), "?? Theme saved!", "success");
+        }
+
+        function resetTheme() {
+            const defaults = {
+                "--box-color": "#0d0d0d",
+                "saved-glow-color": "#00ffcc",
+                "--glow-speed": "3s",
+                "--glow-brightness": "0.6",
+                "--bg-theme": "linear-gradient(-45deg, #0a0a0a, #111111, #1a1a1a, #0d0d0d)",
+                "--glow-enabled": "false",
+                "--text-light": "#e0e0e0",
+                "--accent-green": "#00ffcc",
+                "--accent-blue": "#42a5f5"
+            };
+
+            for (let key in defaults) {
+                localStorage.setItem(key, defaults[key]);
+            }
+            applyTheme(); // Re-apply the default theme
+            showCustomMessage(document.getElementById('theme-settings-content').querySelector('h2'), "?? Theme reset to default and glow disabled.", "success");
+        }
+
+
+        // --- Custom Message Display for small inline messages (not the full modal alert) ---
+        function showCustomMessage(element, message, type) {
+            let msgElement = null;
+            // Find the closest parent that can contain a message, or create one
+            const closestForm = element.closest('form');
+            if (closestForm) {
+                msgElement = closestForm.querySelector('.custom-message');
+                if (!msgElement) {
+                    msgElement = document.createElement('p');
+                    msgElement.classList.add('custom-message');
+                    closestForm.appendChild(msgElement);
+                }
+            } else {
+                // For existing message areas like #auth-message-main or section titles
+                if (element.tagName === 'H2' || element.tagName === 'P') {
+                    msgElement = element;
+                } else {
+                     // Fallback, append to body or a general area if specific parent not found
+                    msgElement = document.querySelector('#dynamic-content-area') || document.body;
+                    const existingTempMsg = msgElement.querySelector('.custom-message.temp');
+                    if(existingTempMsg) existingTempMsg.remove();
+                    const newTempMsg = document.createElement('p');
+                    newTempMsg.classList.add('custom-message', 'temp');
+                    msgElement.appendChild(newTempMsg);
+                    msgElement = newTempMsg;
+                }
+            }
+
+            if (msgElement) {
+                msgElement.textContent = message;
+                msgElement.className = `custom-message ${type}`; // 'error' or 'success'
+                setTimeout(() => {
+                    msgElement.textContent = '';
+                    msgElement.classList.remove('error', 'success');
+                    if (msgElement.classList.contains('temp')) {
+                        msgElement.remove(); // Remove temporary messages
+                    }
+                }, 3000); // Clear message after 3 seconds
+            }
+        }
+
+
+        // --- Initial Load & Authentication Check ---
+        window.addEventListener("DOMContentLoaded", () => {
+            applyTheme(); // Apply saved theme on load
+            console.log('DOM Content Loaded. Checking authentication status...');
+
+            const mainContentWrapper = document.getElementById("main-content-wrapper");
+            const authScreen = document.getElementById("auth-screen");
+
+            const storedAuthEmail = sessionStorage.getItem('current_auth_email');
+            if (storedAuthEmail) {
+                console.log('Found stored email in session. Attempting re-login...');
+                const userJson = getSimulatedKVItem(storedAuthEmail);
+                if (userJson) {
+                    const user = JSON.parse(userJson);
+                    currentUser = { email: user.email, uid: user.uid };
+                    userProfile = user.profile;
+                    console.log('Re-login successful with stored email. User:', currentUser.email);
+                    handleSuccessfulAuth();
+                } else {
+                    console.log('Stored email not found in simulated KV. Showing auth screen.');
+                    sessionStorage.removeItem('current_auth_email'); // Clear invalid session
+                    setAuthMode(false); // Default to login mode
+                    authScreen.style.display = "flex";
+                    mainContentWrapper.style.display = "none";
+                }
+            } else {
+                console.log('No stored email found. Showing auth screen.');
+                setAuthMode(false); // Default to login mode
+                authScreen.style.display = "flex";
+                mainContentWrapper.style.display = "none";
+            }
+
+            // Initial render of plugins (alphabetical order with non-working at bottom)
+            renderPlugins(pluginsData);
+            // Initial render for players section (default to richest)
+            showPlayerSubSection('top-richest-content');
+        });
+
+    </script>
+</body>
+</html>
