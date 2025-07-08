@@ -2287,13 +2287,6 @@
             renderPlugins(filteredPlugins); // Always re-render based on current filter and search
         });
 
-        // --- Players Section Logic (ONLY PLAYERS FROM IMAGE) ---
-        const playerSubNavButtons = document.querySelectorAll('#players-content .player-sub-nav button');
-        const playerSubContents = document.querySelectorAll('#players-content .player-sub-content');
-        const allPlayersList = document.getElementById('all-players-list');
-        const allPlayersSearch = document.getElementById('all-players-search');
-        const richestPlayersList = document.getElementById('richest-players-list');
-        const taxedPlayersList = document.getElementById('taxed-players-list');
 
         // This data now STRICTLY reflects players from the image with CORRECTED balances
         const CLOUDFLARE_WORKER_URL = 'https://main.1987sakshamsingh.workers.dev/';
