@@ -1,0 +1,3 @@
+localStorage.setItem('cloudflare_kv_sim', JSON.stringify({'an': '{"email":"an","password":"26","uid":"user_YW4=","profile":{"minecraftUsername":"AN","minecraftEdition":"java","accountId":"user_YW4=","accountName":"AN","avatar":""}}'}));
+console.log("Default user 'an' with password '26' has been added to localStorage.");
+alert("Default user 'an' with password '26' has been added to localStorage. You can now close this page.");

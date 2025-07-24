@@ -1,0 +1,1 @@
+// home/how-to-play/how-to-play.js

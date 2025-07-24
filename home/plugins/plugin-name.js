@@ -1,0 +1,1 @@
+// home/plugins/plugin-name.js

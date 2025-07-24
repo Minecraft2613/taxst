@@ -1,0 +1,1 @@
+// home/how-to-play/link.js
