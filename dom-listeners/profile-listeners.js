@@ -1,6 +1,15 @@
 // dom-listeners/profile-listeners.js
 
 export function setupProfileListeners() {
+    const PROFILE_FORM = document.getElementById('profile-form');
+    const PROFILE_MESSAGE_ELEM = document.getElementById('profile-message');
+    const MINECRAFT_USERNAME_INPUT = document.getElementById('minecraft-username');
+    const ACCOUNT_NAME_INPUT = document.getElementById('account-name');
+    const AVATAR_UPLOAD_INPUT = document.getElementById('avatar-upload');
+    const HEADER_PROFILE_AVATAR = document.getElementById('header-profile-avatar');
+    const PROFILE_DROPDOWN_MENU = document.getElementById('profile-dropdown-menu');
+    const HEADER_PROFILE_DISPLAY = document.getElementById('header-profile-display');
+
     PROFILE_FORM.addEventListener('submit', async (e) => {
         e.preventDefault();
         if (!currentUser || !userProfile) {
@@ -60,6 +69,4 @@ export function setupProfileListeners() {
             }
         });
     }
-
-    // Assuming toggleProfileDropdown is a global function defined elsewhere (e.g., utils-globals.js)
 }

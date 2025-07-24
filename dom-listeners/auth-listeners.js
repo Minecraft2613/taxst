@@ -1,6 +1,16 @@
 // dom-listeners/auth-listeners.js
 
 export function setupAuthListeners() {
+    const MAIN_AUTH_SUBMIT_BTN = document.getElementById('main-auth-submit-btn');
+    const TOGGLE_AUTH_MODE_BTN = document.getElementById('toggle-auth-mode-btn');
+    const AUTH_PLATFORM_SELECT = document.getElementById('auth-platform-select');
+    const AUTH_MINECRAFT_USERNAME_INPUT = document.getElementById('auth-minecraft-username-input');
+    const MAIN_AUTH_MESSAGE_ELEM = document.getElementById('auth-message-main');
+    const MAIN_AUTH_EMAIL_INPUT = document.getElementById('auth-email-input');
+    const MAIN_AUTH_PASSWORD_INPUT = document.getElementById('auth-password-input');
+    const AUTH_ACCOUNT_NAME_INPUT = document.getElementById('auth-account-name-input');
+    const AGREE_RULES_CHECKBOX = document.getElementById('agree-rules-checkbox');
+
     TOGGLE_AUTH_MODE_BTN.addEventListener('click', (e) => {
         e.preventDefault();
         setAuthMode(!isCreateMode);

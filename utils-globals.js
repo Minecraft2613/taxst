@@ -1,68 +1,18 @@
 // utils-globals.js - Combined utility functions and global variables
 
-// --- Global State Variables and DOM Element References ---
+// --- Global State Variables ---
 let currentUser = null;
 let userProfile = null;
 let isCreateMode = false;
 
-const AUTH_SCREEN = document.getElementById('auth-screen');
-const MAIN_AUTH_FORM = document.getElementById('auth-form-main');
-const MAIN_AUTH_SUBMIT_BTN = document.getElementById('main-auth-submit-btn');
-const TOGGLE_AUTH_MODE_BTN = document.getElementById('toggle-auth-mode-btn');
-const MAIN_AUTH_EMAIL_INPUT = document.getElementById('auth-email-input');
-const MAIN_AUTH_PASSWORD_INPUT = document.getElementById('auth-password-input');
-const AUTH_MINECRAFT_USERNAME_INPUT = document.getElementById('auth-minecraft-username-input');
-const AUTH_ACCOUNT_NAME_INPUT = document.getElementById('auth-account-name-input');
-const AUTH_PLATFORM_SELECT = document.getElementById('auth-platform-select');
-const RULES_CHECKBOX_CONTAINER = document.getElementById('rules-checkbox-container');
-const AGREE_RULES_CHECKBOX = document.getElementById('agree-rules-checkbox');
-const MAIN_AUTH_MESSAGE_ELEM = document.getElementById('auth-message-main');
-const AUTH_WELCOME_MESSAGE = document.getElementById('auth-welcome-message');
-
-const PROFILE_FORM = document.getElementById('profile-form');
-const DISPLAY_EMAIL = document.getElementById('display-email');
-const DISPLAY_MINECRAFT_USERNAME = document.getElementById('display-minecraft-username');
-const DISPLAY_MINECRAFT_EDITION = document.getElementById('display-minecraft-edition');
-const DISPLAY_ACCOUNT_ID = document.getElementById('display-account-id');
-const DISPLAY_ACCOUNT_NAME = document.getElementById('display-account-name');
-
-const MINECRAFT_USERNAME_INPUT = document.getElementById('minecraft-username');
-const ACCOUNT_NAME_INPUT = document.getElementById('account-name');
-
-const PROFILE_MESSAGE_ELEM = document.getElementById('profile-message');
-const AVATAR_UPLOAD_INPUT = document.getElementById('avatar-upload');
-const PROFILE_IMAGE_ELEM = document.getElementById('profile-image');
-const PROFILE_INITIAL_ELEM = document.getElementById('profile-initial');
-const SIDEBAR_LOGOUT_BTN = document.getElementById('sidebar-logout-btn');
-
-const HEADER_PROFILE_DISPLAY = document.getElementById('header-profile-display');
-const HEADER_PROFILE_AVATAR = document.getElementById('header-profile-avatar');
-const HEADER_PROFILE_INITIAL = document.getElementById('header-profile-initial');
-const HEADER_PROFILE_IMAGE = document.getElementById('header-profile-image');
-const PROFILE_DROPDOWN_MENU = document.getElementById('profile-dropdown-menu');
-
-const CHANGE_PASSWORD_FORM = document.getElementById('change-password-form');
-const CURRENT_PASSWORD_INPUT = document.getElementById('current-password');
-const NEW_PASSWORD_INPUT = document.getElementById('new-password');
-const CONFIRM_NEW_PASSWORD_INPUT = document.getElementById('confirm-new-password');
-const CHANGE_PASSWORD_MESSAGE = document.getElementById('change-password-message');
-
-const SIDEBAR = document.getElementById('sidebar');
-const MAIN_CONTENT_WRAPPER = document.getElementById('main-content-wrapper');
-const OVERLAY = document.querySelector('.overlay');
-const SIDEBAR_NAV_LINKS = document.querySelectorAll('#sidebar nav a');
-const HOMEPAGE_NAV_SECTION = document.getElementById('homepage-nav-section');
-const DYNAMIC_CONTENT_AREA = document.getElementById('dynamic-content-area');
-const ALL_CONTENT_SECTIONS = document.querySelectorAll('#dynamic-content-area > .content-section');
-
 // --- Common Utility Functions ---
 
 // --- Custom Message Box (Replaces alert()) ---
-const messageBoxOverlay = document.getElementById('message-box-overlay');
-const messageBoxTitle = document.getElementById('message-box-title');
-const messageBoxContent = document.getElementById('message-box-content');
-
 window.showCustomAlert = function(title, message, duration = 3000) {
+    const messageBoxOverlay = document.getElementById('message-box-overlay');
+    const messageBoxTitle = document.getElementById('message-box-title');
+    const messageBoxContent = document.getElementById('message-box-content');
+
     messageBoxTitle.textContent = title;
     messageBoxContent.textContent = message;
     messageBoxOverlay.classList.add('active');
@@ -233,6 +183,18 @@ window.showCustomMessage = function(element, message, type) {
 // --- Auth Mode Toggle (Login / Create Account) ---
 window.setAuthMode = function(mode) {
     isCreateMode = mode;
+    const MAIN_AUTH_MESSAGE_ELEM = document.getElementById('auth-message-main');
+    const AUTH_MINECRAFT_USERNAME_INPUT = document.getElementById('auth-minecraft-username-input');
+    const AUTH_ACCOUNT_NAME_INPUT = document.getElementById('auth-account-name-input');
+    const AUTH_PLATFORM_SELECT = document.getElementById('auth-platform-select');
+    const RULES_CHECKBOX_CONTAINER = document.getElementById('rules-checkbox-container');
+    const MAIN_AUTH_SUBMIT_BTN = document.getElementById('main-auth-submit-btn');
+    const TOGGLE_AUTH_MODE_BTN = document.getElementById('toggle-auth-mode-btn');
+    const AUTH_WELCOME_MESSAGE = document.getElementById('auth-welcome-message');
+    const MAIN_AUTH_EMAIL_INPUT = document.getElementById('auth-email-input');
+    const MAIN_AUTH_PASSWORD_INPUT = document.getElementById('auth-password-input');
+    const AGREE_RULES_CHECKBOX = document.getElementById('agree-rules-checkbox');
+
     MAIN_AUTH_MESSAGE_ELEM.textContent = '';
 
     AUTH_MINECRAFT_USERNAME_INPUT.style.display = 'none';
@@ -265,14 +227,19 @@ window.setAuthMode = function(mode) {
 };
 
 window.forceDotPrefix = function() {
+    const AUTH_PLATFORM_SELECT = document.getElementById('auth-platform-select');
+    const AUTH_MINECRAFT_USERNAME_INPUT = document.getElementById('auth-minecraft-username-input');
     if (AUTH_PLATFORM_SELECT.value === 'bedrock' && !AUTH_MINECRAFT_USERNAME_INPUT.value.startsWith('.')) {
         AUTH_MINECRAFT_USERNAME_INPUT.value = '.' + AUTH_MINECRAFT_USERNAME_INPUT.value.replace(/^\.+/, '');
     }
 };
 
 window.handleSuccessfulAuth = function() {
+    const AUTH_SCREEN = document.getElementById('auth-screen');
+    const MAIN_CONTENT_WRAPPER = document.getElementById('main-content-wrapper');
+
     AUTH_SCREEN.style.display = 'none';
-    document.getElementById('main-content-wrapper').style.display = 'block';
+    MAIN_CONTENT_WRAPPER.style.display = 'block';
     console.log('Auth successful: showing main content.');
     window.renderProfile();
     window.renderPlugins(pluginsData);
@@ -281,6 +248,14 @@ window.handleSuccessfulAuth = function() {
 };
 
 window.renderProfile = function() {
+    const DISPLAY_EMAIL = document.getElementById('display-email');
+    const DISPLAY_MINECRAFT_USERNAME = document.getElementById('display-minecraft-username');
+    const DISPLAY_MINECRAFT_EDITION = document.getElementById('display-minecraft-edition');
+    const DISPLAY_ACCOUNT_ID = document.getElementById('display-account-id');
+    const DISPLAY_ACCOUNT_NAME = document.getElementById('display-account-name');
+    const MINECRAFT_USERNAME_INPUT = document.getElementById('minecraft-username');
+    const ACCOUNT_NAME_INPUT = document.getElementById('account-name');
+
     if (currentUser && userProfile) {
         DISPLAY_EMAIL.textContent = currentUser.email;
         DISPLAY_MINECRAFT_USERNAME.textContent = userProfile.minecraftUsername || 'N/A';
@@ -298,6 +273,9 @@ window.renderProfile = function() {
 window.updateAvatarDisplay = function(avatarDataUrl, email) {
     const mainProfileImage = document.getElementById('profile-image');
     const mainProfileInitial = document.getElementById('profile-initial');
+    const HEADER_PROFILE_IMAGE = document.getElementById('header-profile-image');
+    const HEADER_PROFILE_INITIAL = document.getElementById('header-profile-initial');
+
     if (avatarDataUrl) {
         mainProfileImage.src = avatarDataUrl;
         mainProfileImage.style.display = 'block';
@@ -314,7 +292,7 @@ window.updateAvatarDisplay = function(avatarDataUrl, email) {
             HEADER_PROFILE_IMAGE.style.display = 'block';
             HEADER_PROFILE_INITIAL.style.display = 'none';
         } else {
-            HEADER_PROFILE_INITIAL.style.display = 'none';
+            HEADER_PROFILE_IMAGE.style.display = 'none';
             HEADER_PROFILE_INITIAL.style.display = 'flex';
             HEADER_PROFILE_INITIAL.textContent = email ? email.charAt(0).toUpperCase() : '?';
         }
@@ -323,12 +301,20 @@ window.updateAvatarDisplay = function(avatarDataUrl, email) {
 
 // --- UI Navigation & Sidebar Logic ---
 window.toggleSidebar = function() {
+    const SIDEBAR = document.getElementById('sidebar');
+    const MAIN_CONTENT_WRAPPER = document.getElementById('main-content-wrapper');
+    const OVERLAY = document.querySelector('.overlay');
+
     SIDEBAR.classList.toggle('open');
     MAIN_CONTENT_WRAPPER.classList.toggle('sidebar-open');
     OVERLAY.classList.toggle('active');
 };
 
 window.showSection = function(sectionId) {
+    const HOMEPAGE_NAV_SECTION = document.getElementById('homepage-nav-section');
+    const ALL_CONTENT_SECTIONS = document.querySelectorAll('#dynamic-content-area > .content-section');
+    const SIDEBAR_NAV_LINKS = document.querySelectorAll('#sidebar nav a');
+
     ALL_CONTENT_SECTIONS.forEach(section => {
         section.classList.remove('active');
     });

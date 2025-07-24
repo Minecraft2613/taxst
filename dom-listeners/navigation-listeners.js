@@ -1,6 +1,8 @@
 // dom-listeners/navigation-listeners.js
 
 export function setupNavigationListeners() {
+    const SIDEBAR_NAV_LINKS = document.querySelectorAll('#sidebar nav a');
+
     SIDEBAR_NAV_LINKS.forEach(link => {
         if (link.href && link.target === '_blank') {
             link.addEventListener('click', (e) => {

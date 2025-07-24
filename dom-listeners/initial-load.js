@@ -9,6 +9,7 @@ import { setupContactListeners } from './contact-listeners.js';
 import { setupThemeListeners } from './theme-listeners.js';
 
 window.addEventListener("DOMContentLoaded", () => {
+    // Initial setup calls that don't depend on specific DOM elements being ready
     applyTheme();
     console.log('DOM Content Loaded. Checking authentication status...');
 
