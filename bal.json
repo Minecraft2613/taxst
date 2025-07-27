@@ -1,6 +1,11 @@
 [
   {
     "balance": 0.0,
+    "name": ".TimeCrayon30438",
+    "uuid": "00000000-0000-0000-0009-01f2b5cfa890"
+  },
+  {
+    "balance": 0.0,
     "name": "toxic_glory",
     "uuid": "61676fcb-a6a4-3431-9dbf-c08cbabf252a"
   },
